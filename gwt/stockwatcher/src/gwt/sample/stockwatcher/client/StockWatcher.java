@@ -1,147 +1,349 @@
 package gwt.sample.stockwatcher.client;
 
-import gwt.sample.stockwatcher.shared.FieldVerifier;
+import java.util.ArrayList;
+import java.util.Date;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+
+import com.google.gwt.http.client.URL;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.i18n.client.NumberFormat;
+
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
+ *
+ * @author Adrian Yau
  */
 public class StockWatcher implements EntryPoint {
-    /**
-     * The message displayed to the user when the server cannot be reached or
-     * returns an error.
-     */
-    private static final String SERVER_ERROR = "An error occurred while "
-            + "attempting to contact the server. Please check your network "
-            + "connection and try again.";
+
+    private static final String JSON_URL = GWT.getModuleBaseURL() + "stockPrices?q=";
+
+    private static final int REFRESH_INTERVAL = 5000; // msecs
+
+    private VerticalPanel mainPanel = new VerticalPanel();
+    private FlexTable stocksFlexTable = new FlexTable();
+    private HorizontalPanel addPanel = new HorizontalPanel();
+    private TextBox newSymbolTextBox = new TextBox();
+    private Button addStockButton = new Button("Add");
+    private Label lastUpdatedLabel = new Label();
+    private Label errorMsgLabel = new Label();
+
+    // Data structure to hold the list of stocks in the stock table.
+    private ArrayList<String> stocks = new ArrayList<String>();
+
+    // Instantiate a service proxy for the StockPriceService.
+    private StockPriceServiceAsync stockPriceSvc = GWT.create(StockPriceService.class);
+
+    // Interfaces are instantiated indirectly in order to use their accessor methods.
+    private StockWatcherConstants constants = GWT.create(StockWatcherConstants.class);
+    private StockWatcherMessages messages = GWT.create(StockWatcherMessages.class);
+
 
     /**
-     * Create a remote service proxy to talk to the server-side Greeting service.
-     */
-    private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
-
-    /**
-     * This is the entry point method.
+     * Entry point method.
      */
     public void onModuleLoad() {
-        final Button sendButton = new Button("Send");
-        final TextBox nameField = new TextBox();
-        nameField.setText("GWT User");
-        final Label errorLabel = new Label();
+        // Set the window title, the header text, and the Add button text.
+        Window.setTitle(constants.stockWatcher());
+        RootPanel.get("appTitle").add(new Label(constants.stockWatcher()));
+        addStockButton = new Button(constants.add());
 
-        // We can add style names to widgets
-        sendButton.addStyleName("sendButton");
+        // Create table for stock data.
+        stocksFlexTable.setText(0, 0, constants.symbol());
+        stocksFlexTable.setText(0, 1, constants.price());
+        stocksFlexTable.setText(0, 2, constants.change());
+        stocksFlexTable.setText(0, 3, constants.remove());
 
-        // Add the nameField and sendButton to the RootPanel
-        // Use RootPanel.get() to get the entire body element
-        RootPanel.get("nameFieldContainer").add(nameField);
-        RootPanel.get("sendButtonContainer").add(sendButton);
-        RootPanel.get("errorLabelContainer").add(errorLabel);
+        // Add styles to elements in the stock list table.
+        stocksFlexTable.setCellPadding(6);
+        stocksFlexTable.getRowFormatter().addStyleName(0, "watchListHeader");
+        stocksFlexTable.addStyleName("watchList");
+        stocksFlexTable.getCellFormatter().addStyleName(0, 1, "watchListNumericColumn");
+        stocksFlexTable.getCellFormatter().addStyleName(0, 2, "watchListNumericColumn");
+        stocksFlexTable.getCellFormatter().addStyleName(0, 3, "watchListRemoveColumn");
 
-        // Focus the cursor on the name field when the app loads
-        nameField.setFocus(true);
-        nameField.selectAll();
+        // Assemble Add Stock panel.
+        addPanel.add(newSymbolTextBox);
+        addPanel.add(addStockButton);
+        addPanel.addStyleName("addPanel");
 
-        // Create the popup dialog box
-        final DialogBox dialogBox = new DialogBox();
-        dialogBox.setText("Remote Procedure Call");
-        dialogBox.setAnimationEnabled(true);
-        final Button closeButton = new Button("Close");
-        // We can set the id of a widget by accessing its Element
-        closeButton.getElement().setId("closeButton");
-        final Label textToServerLabel = new Label();
-        final HTML serverResponseLabel = new HTML();
-        VerticalPanel dialogVPanel = new VerticalPanel();
-        dialogVPanel.addStyleName("dialogVPanel");
-        dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-        dialogVPanel.add(textToServerLabel);
-        dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-        dialogVPanel.add(serverResponseLabel);
-        dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-        dialogVPanel.add(closeButton);
-        dialogBox.setWidget(dialogVPanel);
+        // Assemble Main panel.
+        errorMsgLabel.setStyleName("errorMessage");
+        errorMsgLabel.setVisible(false);
 
-        // Add a handler to close the DialogBox
-        closeButton.addClickHandler(new ClickHandler() {
+        mainPanel.add(errorMsgLabel);
+        mainPanel.add(stocksFlexTable);
+        mainPanel.add(addPanel);
+        mainPanel.add(lastUpdatedLabel);
+
+        // Associate the Main panel with the HTML host page.
+        RootPanel.get("stockList").add(mainPanel);
+
+        // Move cursor focus to the input box.
+        newSymbolTextBox.setFocus(true);
+
+        // Setup timer to refresh list automatically.
+        Timer refreshTimer = new Timer() {
+            @Override
+            public void run() {
+                refreshWatchList();
+            }
+        };
+        refreshTimer.scheduleRepeating(REFRESH_INTERVAL);
+
+        // Listen for mouse click event on the Add button.
+        addStockButton.addClickHandler(new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
-                dialogBox.hide();
-                sendButton.setEnabled(true);
-                sendButton.setFocus(true);
+                addStock();
             }
         });
 
-        // Create a handler for the sendButton and nameField
-        class MyHandler implements ClickHandler, KeyUpHandler {
-            /**
-             * Fired when the user clicks on the sendButton.
-             */
-            public void onClick(ClickEvent event) {
-                sendNameToServer();
-            }
-
-            /**
-             * Fired when the user types in the nameField.
-             */
-            public void onKeyUp(KeyUpEvent event) {
-                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-                    sendNameToServer();
+        // Listen for keyboard events in the input box.
+        newSymbolTextBox.addKeyPressHandler(new KeyPressHandler() {
+            @Override
+            public void onKeyPress(KeyPressEvent event) {
+                if (event.getCharCode() == KeyCodes.KEY_ENTER) {
+                    addStock();
                 }
             }
+        });
+    }
 
-            /**
-             * Send the name from the nameField to the server and wait for a response.
-             */
-            private void sendNameToServer() {
-                // First, we validate the input.
-                errorLabel.setText("");
-                String textToServer = nameField.getText();
-                if (!FieldVerifier.isValidName(textToServer)) {
-                    errorLabel.setText("Please enter at least four characters");
-                    return;
-                }
 
-                // Then, we send the input to the server.
-                sendButton.setEnabled(false);
-                textToServerLabel.setText(textToServer);
-                serverResponseLabel.setText("");
-                greetingService.greetServer(textToServer, new AsyncCallback<String>() {
-                    public void onFailure(Throwable caught) {
-                        // Show the RPC error message to the user
-                        dialogBox.setText("Remote Procedure Call - Failure");
-                        serverResponseLabel.addStyleName("serverResponseLabelError");
-                        serverResponseLabel.setHTML(SERVER_ERROR);
-                        dialogBox.center();
-                        closeButton.setFocus(true);
-                    }
+    /**
+     * Add stock to FlexTable. Executed when the user clicks the addStockButton
+     * or presses enter in the newSymbolTextBox.
+     */
+    private void addStock() {
+        final String symbol = newSymbolTextBox.getText().toUpperCase().trim();
+        newSymbolTextBox.setFocus(true);
 
-                    public void onSuccess(String result) {
-                        dialogBox.setText("Remote Procedure Call");
-                        serverResponseLabel.removeStyleName("serverResponseLabelError");
-                        serverResponseLabel.setHTML(result);
-                        dialogBox.center();
-                        closeButton.setFocus(true);
-                    }
-                });
-            }
+        // Stock code must be between 1 and 10 chars that are numbers, letters,
+        // or dots.
+        if (!symbol.matches("^[0-9A-Z\\.]{1,10}$")) {
+            Window.alert(messages.invalidSymbol(symbol));
+            newSymbolTextBox.selectAll();
+            return;
         }
 
-        // Add a handler to send the name to the server
-        MyHandler handler = new MyHandler();
-        sendButton.addClickHandler(handler);
-        nameField.addKeyUpHandler(handler);
+        newSymbolTextBox.setText("");
+
+        // Don't add the stock if it's already in the table.
+        if (stocks.contains(symbol)) {
+            return;
+        }
+
+        // Add the stock to the table.
+        int row = stocksFlexTable.getRowCount();
+        stocks.add(symbol);
+        stocksFlexTable.setText(row, 0, symbol);
+        stocksFlexTable.setWidget(row, 2, new Label());
+        stocksFlexTable.getCellFormatter().addStyleName(row, 1, "watchListNumericColumn");
+        stocksFlexTable.getCellFormatter().addStyleName(row, 2, "watchListNumericColumn");
+        stocksFlexTable.getCellFormatter().addStyleName(row, 3, "watchListRemoveColumn");
+
+        // Add a button to remove this stock from the table.
+        Button removeStockButton = new Button("x");
+        removeStockButton.addStyleDependentName("remove");  // adds a secondary style dependent on gwt-Button.
+
+        removeStockButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                int removedIndex = stocks.indexOf(symbol);
+                stocks.remove(removedIndex);
+                stocksFlexTable.removeRow(removedIndex + 1);
+            }
+        });
+        stocksFlexTable.setWidget(row, 3, removeStockButton);
+
+        // Get the stock price.
+        refreshWatchList();
     }
+
+
+    /**
+     * Refresh the stock prices. Prices are randomly generated.
+     */
+    private void refreshWatchList() {
+        this.refreshWatchListJSON();
+    }
+
+
+    /**
+     * Approach 1: Use GWT-RPC
+     * Refresh the stock prices. Prices are randomly generated.
+     */
+    private void refreshWatchListRPC() {
+        // Initialize the service proxy.
+        if (stockPriceSvc == null) {
+            stockPriceSvc = GWT.create(StockPriceService.class);
+        }
+
+        // Set up the callback object.
+        AsyncCallback<StockPrice[]> callback = new AsyncCallback<StockPrice[]>() {
+            public void onFailure(Throwable caught) {
+                // TODO: Do something with errors.
+            }
+
+            public void onSuccess(StockPrice[] result) {
+                updateTable(result);
+            }
+        };
+
+        // Make the call to the stock price service.
+        stockPriceSvc.getPrices(stocks.toArray(new String[0]), callback);
+    }
+
+
+    /**
+     * Approach 2: Use JSON
+     * Refresh the stock prices. Prices are randomly generated.
+     */
+    private void refreshWatchListJSON() {
+        if (stocks.size() == 0) {
+            return;
+        }
+
+        String url = JSON_URL;
+
+        // Append watch list stock symbols to query URL.
+        for (String stock : stocks) {
+            url += stock;
+            url += "+";
+        }
+
+        url = URL.encode(url);
+
+
+        // Send request to server and catch any errors.
+        RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
+
+        try {
+            builder.sendRequest(null, new RequestCallback() {
+                public void onError(Request request, Throwable exception) {
+                    displayError("Couldn't retrieve JSON");
+                }
+
+                public void onResponseReceived(Request request,
+                                               Response response) {
+                    if (200 == response.getStatusCode()) {
+                        JsArray<StockData> stockData = asArrayOfStockData(response.getText());
+                        if (stockData.length() > 0) {
+                            StockPrice[] stockPrices = new StockPrice[stockData.length()];
+                            for (int i = 0; i < stockData.length(); i++) {
+                                StockData sd = stockData.get(i);
+                                stockPrices[i] = new StockPrice(sd.getSymbol(), sd.getPrice(), sd.getChange());
+                            }
+                            updateTable(stockPrices);
+                        }
+                    } else {
+                        displayError("Couldn't retrieve JSON ("
+                                + response.getStatusText() + ")");
+                    }
+                }
+            });
+        } catch (RequestException e) {
+            displayError("Couldn't retrieve JSON");
+        }
+    }
+
+
+    /**
+     * Update the Price and Change fields all the rows in the stock table.
+     *
+     * @param prices Stock data for all rows.
+     */
+    private void updateTable(StockPrice[] prices) {
+        for (StockPrice price : prices) {
+            updateTable(price);
+        }
+
+        // Display timestamp showing last refresh.
+        // lastUpdatedLabel.setText("Last update : " + DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(new Date()));
+        lastUpdatedLabel.setText(messages.lastUpdate(new Date()));
+
+        // Clear any errors.
+        errorMsgLabel.setVisible(false);
+    }
+
+
+    private void updateTable(StockPrice price) {
+        // Make sure the stock is still in the stock table.
+        if (!stocks.contains(price.getSymbol())) {
+            return;
+        }
+
+        int row = stocks.indexOf(price.getSymbol()) + 1;
+
+        // Format the data in the Price and Change fields.
+        String priceText = NumberFormat.getFormat("#,##0.00").format(price.getPrice());
+        NumberFormat changeFormat = NumberFormat.getFormat("+#,##0.00;-#,##0.00");
+        String changeText = changeFormat.format(price.getChange());
+        String changePercentText = changeFormat.format(price.getChangePercent());
+
+
+        // Populate the Price and Change fields with new data.
+        stocksFlexTable.setText(row, 1, priceText);
+        Label changeWidget = (Label) stocksFlexTable.getWidget(row, 2);
+        changeWidget.setText(changeText + " (" + changePercentText + "%)");
+
+
+        // Change the color of text in the Change field based on its value.
+        String changeStyleName = "noChange";
+
+        if (price.getChangePercent() < -0.1f) {
+            changeStyleName = "negativeChange";
+        } else if (price.getChangePercent() > 0.1f) {
+            changeStyleName = "positiveChange";
+        }
+
+        changeWidget.setStyleName(changeStyleName);
+    }
+
+
+    /**
+     * Convert the string of JSON into JavaScript object.
+     */
+    final native JsArray<StockData> asArrayOfStockData(String json) /*-{
+        return eval(json);
+    }-*/;
+
+
+    /**
+     * If can't get JSON, display error message.
+     *
+     * @param error the error message
+     */
+    private void displayError(String error) {
+        errorMsgLabel.setText("Error: " + error);
+        errorMsgLabel.setVisible(true);
+    }
+
 }

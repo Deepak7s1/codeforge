@@ -2,6 +2,7 @@
 <module rename-to='stockwatcher'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
   <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.google.gwt.http.HTTP" />
 
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
@@ -15,6 +16,9 @@
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='gwt.sample.stockwatcher.client.StockWatcher'/>
+
+  <!-- Extend the set of values of the client property 'locale' -->
+  <extend-property name="locale" values="de"/>
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>

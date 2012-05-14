@@ -1,34 +1,57 @@
-/** Add css rules here for your application. */
+/* Formatting specific to the StockWatcher application */
 
+body {
+  padding: 10px;
+}
 
-/** Example rules used by the template application (remove for your app) */
-h1 {
-  font-size: 2em;
-  font-weight: bold;
-  color: #777777;
-  margin: 40px 0px 70px;
+/* stock list header row */
+.watchListHeader {
+  background-color: #2062B8;
+  color: white;
+  font-style: italic;
+}
+
+/* stock list flex table */
+.watchList {
+  border: 1px solid silver;
+  padding: 2px;
+  margin-bottom:6px;
+}
+
+/* stock list Price and Change fields */
+.watchListNumericColumn {
+  text-align: right;
+  width:8em;
+}
+
+/* stock list Remove column */
+.watchListRemoveColumn {
   text-align: center;
 }
 
-.sendButton {
-  display: block;
-  font-size: 16pt;
+/* Add Stock panel */
+.addPanel {
+  margin: 10px 0px 15px 0px;
 }
 
-/** Most GWT widgets already have a style name defined */
-.gwt-DialogBox {
-  width: 400px;
+/* stock list, the Remove button */
+.gwt-Button-remove {
+  width: 100px;
 }
 
-.dialogVPanel {
-  margin: 5px;
+/* Dynamic color changes for the Change field */
+.noChange {
+  color: black;
 }
 
-.serverResponseLabelError {
+.positiveChange {
+  color: green;
+}
+
+.negativeChange {
   color: red;
 }
 
-/** Set ids using widget.getElement().setId("idOfElement") */
-#closeButton {
-  margin: 15px 6px 6px;
+.errorMessage {
+  color: red;
 }
