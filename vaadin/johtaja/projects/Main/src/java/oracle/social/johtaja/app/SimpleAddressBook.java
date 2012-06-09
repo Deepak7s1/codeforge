@@ -1,4 +1,4 @@
-package oracle.social.johtaja;
+package oracle.social.johtaja.app;
 
 import com.vaadin.Application;
 import com.vaadin.data.Property;
@@ -14,9 +14,12 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import oracle.social.johtaja.share.NlsUtil;
+
 
 public class SimpleAddressBook extends Application {
-
+    private final static String RESRCBUNDLE = "oracle.social.johtaja.nls.SimpleAddressBookBundle";
+    
     private static String[] fields = { "First Name", "Last Name", "Company", "Mobile Phone", 
                                        "Work Phone", "Home Phone", "Work Email", "Home Email",
                                        "Street", "Zip", "City", "State", "Country" };
@@ -38,7 +41,7 @@ public class SimpleAddressBook extends Application {
 
     private void initLayout() {
         HorizontalSplitPanel splitPanel = new HorizontalSplitPanel();
-        setMainWindow(new Window("Address Book", splitPanel));
+        setMainWindow(new Window(NlsUtil.getMessage(RESRCBUNDLE, "label_address_book"), splitPanel));
         VerticalLayout left = new VerticalLayout();
         left.setSizeFull();
         left.addComponent(contactList);
@@ -46,7 +49,7 @@ public class SimpleAddressBook extends Application {
         left.setExpandRatio(contactList, 1);
         splitPanel.addComponent(left);
         splitPanel.addComponent(contactEditor);
-        contactEditor.setCaption("Contact details editor");
+        contactEditor.setCaption(NlsUtil.getMessage(RESRCBUNDLE, "label_contact_details_editor"));
         contactEditor.setSizeFull();
         contactEditor.getLayout().setMargin(true);
         contactEditor.setImmediate(true);

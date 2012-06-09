@@ -8,11 +8,20 @@
     <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
     <init-param>
       <param-name>application</param-name>
-      <param-value>oracle.social.johtaja.SimpleAddressBook</param-value>
+      <param-value>oracle.social.johtaja.app.SimpleAddressBook</param-value>
     </init-param>
   </servlet>
+  <servlet>
+    <servlet-name>Sandbox</servlet-name>
+    <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+    <init-param>
+      <param-name>application</param-name>
+      <param-value>oracle.social.johtaja.app.Sandbox</param-value>
+    </init-param>
+  </servlet>
+
   <servlet-mapping>
-    <servlet-name>SimpleAddressBook</servlet-name>
+    <servlet-name>Sandbox</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
 </web-app>
