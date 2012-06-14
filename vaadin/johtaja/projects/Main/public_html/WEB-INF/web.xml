@@ -2,13 +2,13 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
-  <display-name>SimpleAddressBook</display-name>
+  <display-name>Johtaja</display-name>
   <servlet>
-    <servlet-name>SimpleAddressBook</servlet-name>
+    <servlet-name>AddressBook</servlet-name>
     <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
     <init-param>
       <param-name>application</param-name>
-      <param-value>oracle.social.johtaja.app.SimpleAddressBook</param-value>
+      <param-value>oracle.social.johtaja.app.AddressBookTutorial</param-value>
     </init-param>
   </servlet>
   <servlet>
@@ -21,7 +21,11 @@
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Sandbox</servlet-name>
+    <servlet-name>AddressBook</servlet-name>
     <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Sandbox</servlet-name>
+    <url-pattern>/sandbox/*</url-pattern>
   </servlet-mapping>
 </web-app>
