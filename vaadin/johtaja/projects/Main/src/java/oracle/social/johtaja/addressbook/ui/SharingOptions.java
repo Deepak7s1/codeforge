@@ -4,10 +4,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.Button.ClickEvent;
 
 
-public class SharingWindow extends Window {
-    public SharingWindow() {
+public class SharingOptions extends Window {
+    
+    public SharingOptions() {
         /*
          * Make the window modal, which will disable all other components while
          * it is visible.
@@ -30,6 +32,11 @@ public class SharingWindow extends Window {
         addComponent(new CheckBox("Gmail"));
         addComponent(new CheckBox(".Mac"));
         Button close = new Button("OK");
+        close.addListener(new Button.ClickListener() {
+            public void buttonClick(ClickEvent event) {
+                SharingOptions.this.close();
+            }
+        });
         addComponent(close);
     }
 }
