@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Furry Friends Campaign</title>
+        <style>
+            #clickMe {
+                cursor: pointer;
+                background: #D8B36E;
+                padding: 20px;
+                text-align: center;
+                width: 310px;
+                display: block;
+                border: 2px solid #000;
+            }
+            #picframe {
+                background: #D8B36E;
+                padding: 20px;
+                width: 310px;
+                display: none;
+                border: 2px solid #000;
+            }
+        </style>
+        
+        <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+        
+        <script type="text/javascript">
+            $(function() {
+                $("#clickMe").click(function() {
+                    $("#pic").fadeIn(1000);
+                    $("#picframe").slideToggle("slow");
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="clickMe">Show Me the Furry Friend of the Day</div>
+        <div id="picframe">
+            <img id="pic" src="images/furry_friend.jpg" />
+        </div>
+    </body>
+</html>
