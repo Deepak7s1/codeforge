@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Jump For Joy</title>
+        <style>
+            div{
+                float:left;
+                height:245px;
+                text-align:left;
+                border: solid #000 3px;
+            }
+            
+            #header{
+                width:100%;
+                border: 0px;
+                height:50px;
+            }
+            
+            #main{
+                background-color: grey;
+                height: 500px;
+            }
+            
+            .guess_box{
+                height:245px;
+            }
+            
+            .discount_text {
+                color: white;
+                text-align:center;
+            }
+            
+            .hover{
+                border: solid #0F0 3px;
+            }
+
+        </style>
+        
+        <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+        
+        <script type="text/javascript">
+            $(function() {
+                // Add hover effect on mouse over.
+                $(".guess_box").hover(
+                    function() {
+                        $(this).addClass("hover");
+                    },
+                    function() {
+                        $(this).removeClass("hover");
+                    });
+
+                
+                // Call the function checkForCode when div is clicked.
+                $(".guess_box").click(checkForCode);
+                
+                /**
+                 * Randomly hide the actual discount code in one of the divs.
+                 */
+                function hideCode() {
+                    var numRand = getRandom(4);
+                    console.log("numRand = " + numRand);
+                    $(".guess_box").each(function(index) {
+                        if (numRand == index) {
+                            $(this).append("<span id='has_discount'></span>");
+                            return false;  // found the div, break out of .each loop.
+                        }
+                    });
+                }
+                
+                hideCode();
+
+                
+                /**
+                 * Click event handler.
+                 */
+                function checkForCode() {
+                    var discount;
+                    
+                    // .contains is a jQuery utility function.
+                    if ($.contains(this, document.getElementById("has_discount") ) ) {
+                        var my_num = getRandom(10);
+                        discount = "<p class='discount_text'>Your Discount is "+ my_num + "%</p>";
+                    }
+                    else {
+                        discount = "<p class='discount_text'>Sorry, no discount this time!</p>" ;
+                    }
+                    
+                    $(this).append(discount);
+                    
+                    $(".guess_box").unbind("click");
+                }
+                
+                /**
+                 * Return a random integer from 0..num.
+                 */
+                function getRandom(num) {
+                    var rdm = Math.floor(Math.random() * num);
+                    return rdm;
+                }
+
+            });            
+        </script>
+    </head>
+    <body>
+        <div id="header">Jump for Joy</div>
+        <div id="main">
+            <div class="guess_box"><img src="images/jump1.jpg"/></div>
+            <div class="guess_box"><img src="images/jump2.jpg"/></div>
+            <div class="guess_box"><img src="images/jump3.jpg"/></div>
+            <div class="guess_box"><img src="images/jump4.jpg"/></div>
+        </div>
+    </body>
+</html>
