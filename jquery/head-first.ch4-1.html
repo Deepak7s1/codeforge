@@ -99,16 +99,17 @@
         <script type="text/javascript">
             $(function(){             
                 var v = false;
-                var $f, $m;
+                var $f, $m;    // $ indicate special variables used to store elements returned by jQuery.
              
                 $("button#vegOn").click(function(){
                     if (v == false){                    
                         $f = $(".fish").parent().parent().detach();
                         
-
+                        // Replace hamburgers with portobello mushrooms.
                         $(".hamburger").replaceWith("<li class='portobello'><em>Portobello Mushroom</em></li>");
                         $(".portobello").parent().parent().addClass("veg_leaf");
                   
+                        // Replace meat with tofu.
                         $(".meat").after("<li class='tofu'><em>Tofu</em></li>");
                         $m = $(".meat").detach();
                         $(".tofu").parent().parent().addClass("veg_leaf");
@@ -127,8 +128,9 @@
 
                         $(".tofu").parent().parent().removeClass("veg_leaf");
                         $(".tofu").each( function(i){
-                        $(this).after($m[i]);
+                            $(this).after($m[i]);
                         });//end each
+                        
                         $(".tofu").remove();
                         v = false;
                     }
