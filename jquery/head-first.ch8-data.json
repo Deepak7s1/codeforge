@@ -1,0 +1,22 @@
+{
+    "runners": [
+        {
+            "fname": "John",
+            "lname": "Smith",
+            "gender": "m",
+            "time": "25:31"
+        },
+        {
+            "fname": "Mary",
+            "lname": "Brown",
+            "gender": "f",
+            "time": "27:02"
+        },
+        {
+            "fname": "Jeremy",
+            "lname": "Lin",
+            "gender": "m",
+            "time": "28:31"
+        }        
+    ]
+}

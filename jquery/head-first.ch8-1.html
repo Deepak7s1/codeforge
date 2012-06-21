@@ -1,0 +1,234 @@
+<!DOCTYPE html> 
+<html> 
+    <head> 
+        <title>Race Finishers</title> 
+        <style>
+            body{
+                background-color: #000;
+                color: white;
+            }
+
+            /* Style for tabs */
+            #main {
+                background: #308080;
+                color: #111;
+                padding: 15px 20px;
+                width: 500px;
+                border: 1px solid #222;
+                margin: 8px auto;
+            }
+            
+            #main > li, #main > ul > li { 
+                list-style: none;
+                float: left; 
+            }
+            
+            #main ul a {
+                display: block;
+                padding: 6px 10px;
+                text-decoration: none !important;
+                margin: 1px;
+                margin-left: 0;
+                color: #FFF;
+                background: #888;
+            }
+            
+            #main ul a:hover {
+                color: #FFF;
+                background: #AAA;
+            }
+              
+            #main ul a.selected {
+                margin-bottom: 0;
+                color: #000;
+                background: white;
+                border-bottom: 1px solid white;
+                cursor: default;
+            }
+              
+            #main div {
+                padding: 10px 10px 8px 10px;
+                *padding-top: 3px;
+                *margin-top: -15px;
+                clear: left;
+                background: white;
+                height: 300px ;
+            }
+
+        </style>
+        
+        <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+        <script src="scripts/jquery.idTabs.min.js"></script> 
+        
+        <script type="text/javascript">
+            $(function(){
+            	var FREQ = 5000 ;
+                var startUpdate = false;
+                
+                /**
+                 * This is the function that reads from an XML file, and gleans from it
+                 * the runner data for updating to the UI.
+                 */
+                function getXMLRacers(){
+                    $.ajax({
+                        url: "head-first.ch8-data.xml",
+                        cache: false,
+                        dataType: "xml",
+                        success:  function(xml) {
+                            
+                            $('#finishers_m').empty();
+                            $('#finishers_f').empty();
+                            $('#finishers_all').empty();
+                            
+                            // Find the 'runner' elements in the returned XML document.
+                            $(xml).find("runner").each(function() {
+                                var info = '<li>Name: ' + $(this).find("fname").text() + ' ' + 
+                                           $(this).find("lname").text() + '. Time: ' + 
+                                           $(this).find("time").text() + '</li>';
+                                           
+                                if ( $(this).find("gender").text() == "m" ) {
+                                    $('#finishers_m').append( info );
+                                }
+                                else if ( $(this).find("gender").text() == "f" ) {
+                                    $('#finishers_f').append( info );
+                                }
+                                else {  
+                                }
+                                $('#finishers_all').append( info );
+                            });				
+                        }
+                    });
+                }
+
+
+                /**
+                 * This is the function that reads from a JSON file, and gleans from it
+                 * the runner data for updating to the UI. 
+                 */
+                function getJSONRacers(){
+                    // Only works if this is run from a web server (e.g. Tomcat).
+                    
+                    $.getJSON("head-first.ch8-data.json", function(json) {
+                            if (json.runners.length> 0) {
+                                $('#finishers_m').empty();
+                                $('#finishers_f').empty();
+                                $('#finishers_all').empty();
+                                $.each(json.runners, function() {
+                                    var info = '<li>Name: ' + this['fname'] + ' ' + this['lname'] + 
+                                               '. Time: ' + this['time'] + '</li>';
+                                    if (this['gender'] == 'm') {
+                                        $('#finishers_m').append( info );
+                                    }
+                                    else if (this['gender'] == 'f') {
+                                        $('#finishers_f').append(info);
+                                    }
+                                    else{
+                                    }
+                                    $('#finishers_all').append( info );
+                                });
+                            }
+                    });
+                }
+ 
+
+                
+                /**
+                 * Get the current time and update the element on the page.
+                 */
+                function getTime(){
+                    var a_p = "";
+                    var d = new Date();
+                    var curr_hour = d.getHours();
+                    
+                    (curr_hour < 12) ? a_p = "AM" : a_p = "PM";
+                    (curr_hour == 0) ? curr_hour = 12 : curr_hour = curr_hour;
+                    (curr_hour > 12) ? curr_hour = curr_hour - 12 : curr_hour = curr_hour;
+                    
+                    var curr_min = d.getMinutes().toString();
+                    var curr_sec = d.getSeconds().toString();
+                    
+                    if (curr_min.length == 1) { curr_min = "0" + curr_min; }
+                    if (curr_sec.length == 1) { curr_sec = "0" + curr_sec; } 
+                    
+                    $('#updatedTime').html(curr_hour + ":" + curr_min + ":" + curr_sec + " " + a_p );
+                }
+
+                
+                /**
+                 * Self-referential function to set periodic timer events.
+                 * We can't use setInterval here because the function will run at fixed
+                 * intervals even when the AJAX operation has not returned.
+                 */
+                function periodicUpdate() {
+                    setTimeout(function() {
+                        if (startUpdate) {
+                            getTime();
+                            getJSONRacers();
+                            periodicUpdate();  // self-referential
+                        }
+                    }, FREQ);
+                }
+                
+                // Initial page load.
+                getTime();
+                getJSONRacers();
+
+                
+                /**
+                 * When the Start button is clicked.
+                 */
+                $("#btnStart").click(function(){
+                    startUpdate = true;
+                    $(this).attr("disabled", true);
+                    $("#freq").html( "Updating every " + FREQ/1000 + " second(s).");
+                    periodicUpdate();
+                });	
+
+                /**
+                 * When the Stop button is clicked.
+                 */
+                $("#btnStop").click(function(){
+                    startUpdate = false;
+                    $("#btnStart").removeAttr("disabled");
+                    $("#freq").html( "Updates paused." );
+                });
+
+                
+            });
+        </script>
+    </head> 
+    <body> 
+        <header> 
+            <h2>Race Finishers!</h2> 
+        </header>
+        <p id="freq"></p>
+        <button id="btnStart">Start</button>
+        <button id="btnStop">Stop</button>
+        <div id="main"> 
+            <ul class="idTabs"> 
+                <li><a href="#male">Male Finishers</a></li> 
+                <li><a href="#female">Female Finishers</a></li> 
+                <li><a href="#all">All Finishers</a></li> 
+            </ul> 
+            <div id="male"> 
+                <h4>Male Finishers</h4>
+				<ul id="finishers_m">
+				</ul>
+            </div> 
+            <div id="female"> 
+                <h4>Female Finishers</h4>
+				<ul id="finishers_f">
+				</ul>
+            </div> 
+            <div id="all"> 
+                <h4>All Finishers</h4>
+				<ul id="finishers_all">
+				</ul>
+            </div> 
+        </div>
+        <footer>
+			<h4>Congratulations to all our finishers!</h4>		
+			Last Updated: <div id="updatedTime"></div>
+		</footer>
+    </body> 
+</html>
