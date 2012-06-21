@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Monster Mashup</title> 
+        <style>
+            body {
+                background-color:#000;
+            }
+
+            p {
+                color:#33FF66;
+                font-family: Tahoma, Verdana, Arial, 
+                Helvetica, sans-serif;
+                font-size:12px;
+            }
+
+            #text_top {
+                position:relative;
+                z-index: 4;
+            }
+            
+            #container {
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                z-index: 0;
+            }
+            
+            .lightning {
+                display: none;  // don't show lightning initially.
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                z-index: 0;
+            }
+
+            #frame {
+                position: absolute;
+                left: 100px;
+                top: 100px;
+                width:545px;
+                height:629px;
+                background-image:url('images/frame.png');
+                z-index: 2;
+                overflow: hidden; // allows us to hide the part of the image strip that exceeds width.
+            }
+            
+            #pic_box{
+                position: relative;
+                left: 91px;
+                top: 84px;
+                width: 367px;
+                height: 460px;
+                z-index: 1;
+                overflow: hidden; // allows us to hide the part of the image strip that exceeds width.
+            }
+            
+            .face {
+                position: relative;
+                left: 0px;
+                top: 0px;
+                z-index: 0;
+                cursor: pointer;
+            }
+            
+            #head {
+                height: 172px;
+            }
+            #eyes {
+                height: 79px;
+            }
+            #nose {
+                height: 86px;
+            }
+            #mouth {
+                height: 117px;
+            }
+            
+        </style>
+        
+        <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+        
+        <script type="text/javascript">
+            $(function() {
+                var headclix = 0;
+                var eyesclix = 0;
+                var noseclix = 0;
+                var mouthclix = 0;
+                
+                
+                $("#head").click(function(){
+                    if (headclix < 9) {
+                        headclix++;
+                        $(this).animate({left:"-=367px"}, 500);
+                    }
+                    else {
+                        headclix = 0;
+                        $(this).animate({left:"0px"}, 500);
+                    }
+                });
+
+                $("#eyes").click(function(){
+                    if (eyesclix < 9) {
+                        eyesclix++;
+                        $(this).animate({left:"-=367px"}, 500);
+                    }
+                    else {
+                        eyesclix = 0;
+                        $(this).animate({left:"0px"}, 500);
+                    }
+                });
+
+                $("#nose").click(function(){
+                    if (noseclix < 9) {
+                        noseclix++;
+                        $(this).animate({left:"-=367px"}, 500);
+                    }
+                    else {
+                        noseclix = 0;
+                        $(this).animate({left:"0px"}, 500);
+                    }
+                });
+
+                $("#mouth").click(function(){
+                    if (mouthclix < 9) {
+                        mouthclix++;
+                        $(this).animate({left:"-=367px"}, 500);
+                    }
+                    else {
+                        mouthclix = 0;
+                        $(this).animate({left:"0px"}, 500);
+                    }
+                });
+                
+                
+                /**
+                 * Return a random integer from 1..num.
+                 */
+                function getRandom(num) {
+                    var rdm = (Math.floor(Math.random() * num)) + 1;
+                    return rdm;
+                }
+
+                /**
+                 * This method is invoked every N ms interval.
+                 */
+                function lightningEffect() {
+                    var randNum = getRandom(3);
+                    $("#lightning" + randNum).fadeIn(1500).fadeOut(1000);
+                }
+                
+                setInterval(lightningEffect, 5000);
+            });
+        </script>
+	</head>
+	<body>
+        <header id="text_top"><img src="images/Monster_Mashup.png" />
+            <p>Make your own monster face by clicking on the picture.</p>
+        </header>
+        <div id="container"> 
+            <img class="lightning" id="lightning1" src="images/lightning-01.jpg" /> 
+            <img class="lightning" id="lightning2" src="images/lightning-02.jpg" /> 
+            <img class="lightning" id="lightning3" src="images/lightning-03.jpg" />
+  
+            <div id="frame">
+                <div id="pic_box">
+                    <div id="head"  class="face"><img src="images/headsstrip.jpg"></div>
+                    <div id="eyes"  class="face"><img src="images/eyesstrip.jpg"></div>
+                    <div id="nose"  class="face"><img src="images/nosesstrip.jpg"></div>
+                    <div id="mouth" class="face"><img src="images/mouthsstrip.jpg"></div>
+                </div>
+            </div>
+        </div>
+	</body>
+</html>
