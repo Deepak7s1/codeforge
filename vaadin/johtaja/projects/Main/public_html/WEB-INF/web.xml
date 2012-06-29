@@ -3,12 +3,24 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
   <display-name>Johtaja</display-name>
+  <listener>
+    <listener-class>oracle.social.johtaja.app.servlet.AppContextListener</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>AddressBook</servlet-name>
     <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
     <init-param>
       <param-name>application</param-name>
       <param-value>oracle.social.johtaja.app.AddressBookTutorial</param-value>
+    </init-param>
+  </servlet>
+  <servlet>
+    <servlet-name>MainApp</servlet-name>
+    <servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+    <init-param>
+      <param-name>application</param-name>
+      <param-value>oracle.social.johtaja.app.MainApplication</param-value>
     </init-param>
   </servlet>
   <servlet>
@@ -21,11 +33,11 @@
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>AddressBook</servlet-name>
+    <servlet-name>MainApp</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>Sandbox</servlet-name>
-    <url-pattern>/sandbox/*</url-pattern>
+    <servlet-name>AddressBook</servlet-name>
+    <url-pattern>/addressbook/*</url-pattern>
   </servlet-mapping>
 </web-app>
