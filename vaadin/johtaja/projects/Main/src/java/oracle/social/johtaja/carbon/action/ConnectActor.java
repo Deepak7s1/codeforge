@@ -2,14 +2,17 @@ package oracle.social.johtaja.carbon.action;
 
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 
 import java.util.logging.Logger;
 
 import oracle.social.johtaja.app.MainApplication;
+import oracle.social.johtaja.carbon.view.CarbonMainLayout;
 import oracle.social.johtaja.carbon.view.ConnectSubWindow;
 import oracle.social.johtaja.carbon.view.MainMenuBar;
 import oracle.social.johtaja.service.ServerSession;
@@ -77,15 +80,25 @@ public class ConnectActor implements Button.ClickListener, FieldEvents.TextChang
         return new Command() {
             public void menuSelected(MenuItem selectedItem) {
                 serverSide.serviceLogout();
+                
+                // Notification message.
                 Notification successMessage = new Notification("You are disconnected.");
                 successMessage.setPosition(Notification.POSITION_BOTTOM_RIGHT);
                 successMessage.setDelayMsec(2000);
                 mainWin.showNotification(successMessage);
                 
+                // Update menu items to disconnected state.
                 MenuItem connectItem = (MenuItem)mapp.getUIReference(MainMenuBar.UI_CONNECT_ID);
                 MenuItem disconnectItem = (MenuItem)mapp.getUIReference(MainMenuBar.UI_DISCONNECT_ID);
+                MenuItem exploreMenu = (MenuItem)mapp.getUIReference(MainMenuBar.UI_EXPLORE_ID);
+                
                 connectItem.setEnabled(true);
                 disconnectItem.setEnabled(false);
+                exploreMenu.setEnabled(false);
+                
+                // Clear main region.
+                VerticalLayout region = (VerticalLayout)mapp.getUIReference(CarbonMainLayout.UI_REGION_ID);
+                region.removeAllComponents();
             }
         };
     }
@@ -113,6 +126,11 @@ public class ConnectActor implements Button.ClickListener, FieldEvents.TextChang
         successMessage.setPosition(Notification.POSITION_BOTTOM_RIGHT);
         successMessage.setDelayMsec(2000);
         dialogWin.getParent().showNotification(successMessage);
+        
+        // Enable menu bar items.
+        MainApplication mapp = (MainApplication)dialogWin.getApplication();
+        MenuItem exploreMenu = (MenuItem)mapp.getUIReference(MainMenuBar.UI_EXPLORE_ID);
+        exploreMenu.setEnabled(true);
     }
 
 

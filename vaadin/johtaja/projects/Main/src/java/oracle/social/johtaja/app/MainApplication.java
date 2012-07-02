@@ -1,7 +1,6 @@
 package oracle.social.johtaja.app;
 
 import com.vaadin.Application;
-
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Window;
 
@@ -10,11 +9,11 @@ import java.util.logging.Logger;
 
 import oracle.social.johtaja.carbon.action.ConnectActor;
 import oracle.social.johtaja.carbon.action.NaviActor;
-
 import oracle.social.johtaja.carbon.view.CarbonMainLayout;
 import oracle.social.johtaja.carbon.view.ConnectSubWindow;
 import oracle.social.johtaja.carbon.view.MainMenuBar;
 import oracle.social.johtaja.service.ServerSession;
+import oracle.social.johtaja.service.ServiceFactory;
 
 
 public class MainApplication extends Application {
@@ -40,7 +39,7 @@ public class MainApplication extends Application {
         CarbonMainLayout layout = new CarbonMainLayout(this);
         
         getMainWindow().setContent(layout);
-        getMainWindow().addWindow(new ConnectSubWindow(getMainWindow(), "Login to OSN Server"));
+        getMainWindow().addWindow(new ConnectSubWindow(this));
     }
     
     
@@ -55,16 +54,30 @@ public class MainApplication extends Application {
 
         connectItem.setCommand(new ConnectActor(csw).connectCommand());
         disconnectItem.setCommand(new ConnectActor(csw).disconnectCommand());
-        usersItem.setCommand(new NaviActor(getMainWindow()).showUsersModule());
+        usersItem.setCommand(new NaviActor(this).showUsersModule());
     }
     
     
+    /**
+     * Get the server session associated with this application.
+     * @return the ServerSession instance.
+     */
     public ServerSession getServerSession() {
         if (serverSession == null) {
             serverSession = new ServerSession();
         }
         return serverSession;
     }
+    
+    
+    /**
+     * Get the service factory associated with this application.
+     * @return the ServiceFactory instance.
+     */
+    public ServiceFactory getServiceFactory() {
+        return getServerSession().getServiceFactory();
+    }
+    
     
     
     public void addUIReference(String id, Object component) {

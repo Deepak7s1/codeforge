@@ -15,12 +15,16 @@ import waggle.core.exceptions.XRuntimeException;
 import waggle.core.id.XClientID;
 
 
+/**
+ * Encapsulates the user session with the OSN server. 
+ */
 public class ServerSession {
     private static final String CLASSNAME = ServerSession.class.getName();
     private static final Logger logger = Logger.getLogger(CLASSNAME);
 
     private XAPI xAPI;
     private XLoginInfo xLoginInfo = null;
+    private ServiceFactory sFactory = null;
     
     
     public ServerSession() {
@@ -28,6 +32,7 @@ public class ServerSession {
         XClientID xClientId = XClientID.generate();
         xAPI.setClientID(xClientId);
         xAPI.setProtocolXML(false);  // use JSON
+        sFactory = ServiceFactory.newInstance(xAPI);
     }
     
     public ServerSession(String serverURL, String connectPath) {
@@ -43,6 +48,16 @@ public class ServerSession {
     }
     
     
+    /**
+     * Get the service factory associated with this server session.
+     * @return ServiceFactory
+     */
+    public ServiceFactory getServiceFactory() {
+        return sFactory;
+    }
+    
+    
+
     public void serviceLogin(String username, String password) throws Exception {
         XLoginCredentialsInfo xLoginCredentialsInfo = new XLoginCredentialsInfo();
 

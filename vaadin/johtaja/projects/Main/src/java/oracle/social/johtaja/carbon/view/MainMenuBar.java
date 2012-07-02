@@ -11,6 +11,7 @@ import oracle.social.johtaja.app.MainApplication;
 public class MainMenuBar extends VerticalLayout {
     public final static String UI_CONNECT_ID = "MenuItem:connect";
     public final static String UI_DISCONNECT_ID = "MenuItem:disconnect";
+    public final static String UI_EXPLORE_ID = "MenuItem:explore";
     public final static String UI_USERS_ID = "MenuItem:users";
     
     private MenuBar menubar = new MenuBar();
@@ -26,11 +27,13 @@ public class MainMenuBar extends VerticalLayout {
         mapp.addUIReference(UI_DISCONNECT_ID, disconnectItem);
         
         final MenuItem exploreMenu = menubar.addItem("Explore", null);
+        mapp.addUIReference(UI_EXPLORE_ID, exploreMenu);
+        
         final MenuItem usersItem = exploreMenu.addItem("Users", null);
         mapp.addUIReference(UI_USERS_ID, usersItem);        
         
         final MenuItem helpMenu = menubar.addItem("Help", null);
-        helpMenu.addItem("About...", menuCommand);
+        helpMenu.addItem("About...", aboutMenuCommand);
         
         
         // Stretch the menu bar.
@@ -40,9 +43,16 @@ public class MainMenuBar extends VerticalLayout {
     }
     
     
-    private Command menuCommand = new Command() {
+    private Command aboutMenuCommand = new Command() {
         public void menuSelected(MenuItem selectedItem) {
-            getWindow().showNotification("Not Implemented: " + selectedItem.getText());
+            getWindow().addWindow(new AboutWindow());
+        }
+    };
+
+
+    private Command notYetImplementedCommand = new Command() {
+        public void menuSelected(MenuItem selectedItem) {
+            getWindow().showNotification("Not Yet Implemented: " + selectedItem.getText());
         }
     };
 

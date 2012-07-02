@@ -13,19 +13,17 @@ import oracle.social.johtaja.carbon.action.ConnectActor;
 
 
 public class ConnectSubWindow extends Window {
+    public final static String DIALOG_TITLE = "Login to OSN Server";
     public final static String UI_SUBWINDOW_ID = "window:connect";
     
-    Window parentWin;
     VerticalLayout form;
     TextField username, serverURL, contextPath;
     PasswordField password;
     Button submitButton;
 
 
-    public ConnectSubWindow(Window parent, String title) {
-        super(title);
-        parentWin = parent;
-        MainApplication mapp = (MainApplication)parent.getApplication();
+    public ConnectSubWindow(MainApplication mapp) {
+        super(DIALOG_TITLE);
         mapp.addUIReference(UI_SUBWINDOW_ID, this);
         
         createDialog();
@@ -48,7 +46,7 @@ public class ConnectSubWindow extends Window {
             // Username field + input prompt
             username = new TextField();
             username.setInputPrompt("Username");
-            username.setValue("user1");
+            username.setValue("admin");
             username.setColumns(20);
             username.setImmediate(true);
             username.addListener(new ConnectActor(this));
@@ -91,22 +89,22 @@ public class ConnectSubWindow extends Window {
     
     
     public String getUsername() {
-        return username.getValue().toString();
+        return username.getValue().toString().trim();
     }
     
     
     public String getPassword() {
-        return password.getValue().toString();
+        return password.getValue().toString().trim();
     }
     
     
     public String getServerURL() {
-        return serverURL.getValue().toString();
+        return serverURL.getValue().toString().trim();
     }
     
     
     public String getServerContextPath() {
-        return contextPath.getValue().toString();
+        return contextPath.getValue().toString().trim();
     }
     
     
