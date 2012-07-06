@@ -2,9 +2,9 @@ package oracle.social.johtaja.carbon.action;
 
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
@@ -51,6 +51,11 @@ public class ConnectActor implements Button.ClickListener, FieldEvents.TextChang
 
             MenuItem disconnectMenuItem = (MenuItem)mapp.getUIReference(MainMenuBar.UI_DISCONNECT_ID);
             disconnectMenuItem.setEnabled(true);
+            
+            // Initiate client-side polling.
+            ProgressIndicator poller = (ProgressIndicator)mapp.getUIReference(MainMenuBar.UI_POLLER);
+            poller.setEnabled(true);
+            poller.setVisible(true);
         }
         catch (Exception e) {
             showErrorNotification();
@@ -80,6 +85,11 @@ public class ConnectActor implements Button.ClickListener, FieldEvents.TextChang
         return new Command() {
             public void menuSelected(MenuItem selectedItem) {
                 serverSide.serviceLogout();
+                
+                // Terminate client-side polling.
+                ProgressIndicator poller = (ProgressIndicator)mapp.getUIReference(MainMenuBar.UI_POLLER);
+                poller.setEnabled(false);
+                poller.setVisible(false);
                 
                 // Notification message.
                 Notification successMessage = new Notification("You are disconnected.");

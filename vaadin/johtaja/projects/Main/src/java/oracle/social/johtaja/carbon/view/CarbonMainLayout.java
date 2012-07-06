@@ -6,8 +6,6 @@ import com.vaadin.ui.VerticalLayout;
 
 import java.util.logging.Logger;
 
-import oracle.social.johtaja.addressbook.ui.PersonList;
-
 import oracle.social.johtaja.app.MainApplication;
 
 

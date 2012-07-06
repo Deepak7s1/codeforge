@@ -15,7 +15,7 @@ import oracle.social.johtaja.carbon.action.UserSearchActor;
 
 public class UserModuleLayout extends HorizontalSplitPanel {
     public final static String UI_USERS_LAYOUT_ID = "UserModuleLayout";
-    public final static String UI_FIND_PREFIX_FIELD_ID = "TextField:findNamePrefixField";
+    public final static String UI_FIND_PREFIX_FIELD_ID = "TextField:findUserNamePrefixField";
 
     private MainApplication mapp;
     

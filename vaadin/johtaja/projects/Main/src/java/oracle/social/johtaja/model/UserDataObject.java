@@ -17,7 +17,9 @@ public class UserDataObject implements Serializable {
     private Boolean enabled;
     private Boolean deleted;
 
-
+    public UserDataObject() {
+    }
+    
     public UserDataObject(XUserInfo xuser) {
         this.userId = xuser.ID.toString();
         this.displayName = xuser.DisplayName;
@@ -30,8 +32,8 @@ public class UserDataObject implements Serializable {
         this.userId = xuser.ID.toString();
         this.displayName = xuser.DisplayName;
         this.emailAddress = xuser.EMailAddress;
-        this.enabled = xuser.Enabled;
-        this.deleted = xuser.Deleted;
+        this.enabled = true;
+        this.deleted = false;
     }
 
     public void setUserId(String userID) {
