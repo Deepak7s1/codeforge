@@ -2,6 +2,7 @@ package oracle.social.johtaja.carbon.view;
 
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
@@ -15,8 +16,14 @@ import oracle.social.johtaja.app.MainApplication;
 public class MainMenuBar extends VerticalLayout {
     public final static String UI_CONNECT_ID = "MenuItem:connect";
     public final static String UI_DISCONNECT_ID = "MenuItem:disconnect";
-    public final static String UI_EXPLORE_ID = "MenuItem:explore";
+    public final static String UI_EXIT_ID = "MenuItem:exit";
+
+    public final static String UI_MONITOR_ID = "MenuItem:monitorMenu";
+    public final static String UI_BCEVENTS_ID = "MenuItem:bcEvents";
+
+    public final static String UI_EXPLORE_ID = "MenuItem:exploreMenu";
     public final static String UI_USERS_ID = "MenuItem:users";
+
     public final static String UI_POLLER = "ProgressIndicator:poller";
     
     private MenuBar menubar = new MenuBar();
@@ -25,6 +32,10 @@ public class MainMenuBar extends VerticalLayout {
     public MainMenuBar(MainApplication mapp) {
         final CssLayout cssLayout = new CssLayout();
         cssLayout.setWidth("100%");
+        
+        Embedded logo = new Embedded("", new ThemeResource("images/osn-logo.png"));
+        logo.setSizeUndefined();
+        logo.setStyleName("logo");
                 
         final CssLayout header_first = new CssLayout();
         header_first.setSizeUndefined();  // disable the default 100% width.
@@ -34,6 +45,8 @@ public class MainMenuBar extends VerticalLayout {
         final Label header_title = new Label("Oracle Social - Developer Tool");
         header_title.setSizeUndefined();
         header_title.setStyleName("header_title");
+        
+        header_first.addComponent(logo);
         header_first.addComponent(header_title);
         
         final Label header_second = new Label();
@@ -52,27 +65,47 @@ public class MainMenuBar extends VerticalLayout {
         poller.setEnabled(false);
         poller.setVisible(false);
         poller.setStyleName("poller");
-//      poller.setIcon(new ThemeResource("images/ajax-loader.gif"));
         mapp.addUIReference(UI_POLLER, poller);
         header_third.addComponent(poller);
 
         addComponent(cssLayout);
         
-
+        //////////////////////
+        // Application Menu.
         final MenuItem applicationMenu = menubar.addItem("Application", null);
         final MenuItem connectItem = applicationMenu.addItem("Connect to server...", null);
         mapp.addUIReference(UI_CONNECT_ID, connectItem);
         
-        applicationMenu.addSeparator();
         final MenuItem disconnectItem = applicationMenu.addItem("Disconnect from server", null);
+        disconnectItem.setEnabled(false);
         mapp.addUIReference(UI_DISCONNECT_ID, disconnectItem);
+
+        applicationMenu.addSeparator();
+
+        final MenuItem exitItem = applicationMenu.addItem("Exit", null);
+        mapp.addUIReference(UI_EXIT_ID, exitItem);
+
+
+        //////////////////////
+        // Monitor Menu.
+        final MenuItem monitorMenu = menubar.addItem("Monitor", null);
+        mapp.addUIReference(UI_MONITOR_ID, monitorMenu);
         
+        final MenuItem bcEventsItem = monitorMenu.addItem("Backchannel Events", null);
+        mapp.addUIReference(UI_BCEVENTS_ID, bcEventsItem);
+
+
+        //////////////////////
+        // Explore Menu.
         final MenuItem exploreMenu = menubar.addItem("Explore", null);
         mapp.addUIReference(UI_EXPLORE_ID, exploreMenu);
         
         final MenuItem usersItem = exploreMenu.addItem("Users", null);
         mapp.addUIReference(UI_USERS_ID, usersItem);        
+
         
+        //////////////////////
+        // Help Menu.
         final MenuItem helpMenu = menubar.addItem("Help", null);
         helpMenu.addItem("About...", aboutMenuCommand);
                 

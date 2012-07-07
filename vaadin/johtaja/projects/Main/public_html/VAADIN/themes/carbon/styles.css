@@ -8,6 +8,13 @@
     background-color: #EFF0F5;     
 }
 
+.logo {
+    float: left;
+    width: 24px;
+    margin: 5px 0px 0px 5px;
+    border: 0;
+}
+
 .header_first {
 	float: left;
 	width: 33%; 
@@ -16,10 +23,11 @@
 }
 
 .header_title {
+    float: left;
 	font-size: 14px;
 	font-weight: bold;
 	color: #DBE8F1;
-    margin: 5px 5px 5px 10px;
+    margin: 5px 0px 0px 5px;
 }
 
 .header_second {
@@ -59,3 +67,9 @@ div.v-progressindicator-indeterminate {
     background: transparent url(images/ajax-loader.gif) no-repeat 50%;
 }
 
+/*
+ * Hide captions for embedded images.
+ */
+div.v-caption-logo {
+    display: none;
+}

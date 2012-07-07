@@ -2,6 +2,8 @@ package oracle.social.johtaja.carbon.action;
 
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.MenuBar;
+
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.ProgressIndicator;
@@ -79,40 +81,46 @@ public class ConnectActor implements Button.ClickListener, FieldEvents.TextChang
      */
     public Command disconnectCommand() {
         final MainApplication mapp = (MainApplication)dialogWin.getApplication();
-        final ServerSession serverSide = mapp.getServerSession();
-        final Window mainWin = dialogWin.getParent();
 
         return new Command() {
             public void menuSelected(MenuItem selectedItem) {
-                serverSide.serviceLogout();
-                
-                // Terminate client-side polling.
-                ProgressIndicator poller = (ProgressIndicator)mapp.getUIReference(MainMenuBar.UI_POLLER);
-                poller.setEnabled(false);
-                poller.setVisible(false);
-                
-                // Notification message.
-                Notification successMessage = new Notification("You are disconnected.");
-                successMessage.setPosition(Notification.POSITION_BOTTOM_RIGHT);
-                successMessage.setDelayMsec(2000);
-                mainWin.showNotification(successMessage);
-                
-                // Update menu items to disconnected state.
-                MenuItem connectItem = (MenuItem)mapp.getUIReference(MainMenuBar.UI_CONNECT_ID);
-                MenuItem disconnectItem = (MenuItem)mapp.getUIReference(MainMenuBar.UI_DISCONNECT_ID);
-                MenuItem exploreMenu = (MenuItem)mapp.getUIReference(MainMenuBar.UI_EXPLORE_ID);
-                
-                connectItem.setEnabled(true);
-                disconnectItem.setEnabled(false);
-                exploreMenu.setEnabled(false);
-                
-                // Clear main region.
-                VerticalLayout region = (VerticalLayout)mapp.getUIReference(CarbonMainLayout.UI_REGION_ID);
-                region.removeAllComponents();
+                ConnectActor.this.disconnect(mapp);
             }
         };
     }
-
+    
+    
+    public void disconnect(MainApplication mapp) {
+        ServerSession serverSide = mapp.getServerSession();
+        serverSide.serviceLogout();
+        
+        // Terminate client-side polling.
+        ProgressIndicator poller = (ProgressIndicator)mapp.getUIReference(MainMenuBar.UI_POLLER);
+        poller.setEnabled(false);
+        poller.setVisible(false);
+        
+        // Notification message.
+        Notification successMessage = new Notification("You are disconnected.");
+        successMessage.setPosition(Notification.POSITION_BOTTOM_RIGHT);
+        successMessage.setDelayMsec(2000);
+        mapp.getMainWindow().showNotification(successMessage);
+        
+        // Update menu items to disconnected state.
+        MenuItem connectItem = (MenuItem)mapp.getUIReference(MainMenuBar.UI_CONNECT_ID);
+        MenuItem disconnectItem = (MenuItem)mapp.getUIReference(MainMenuBar.UI_DISCONNECT_ID);
+        MenuItem monitorMenu = (MenuItem)mapp.getUIReference(MainMenuBar.UI_MONITOR_ID);
+        MenuItem exploreMenu = (MenuItem)mapp.getUIReference(MainMenuBar.UI_EXPLORE_ID);
+        
+        connectItem.setEnabled(true);
+        disconnectItem.setEnabled(false);
+        monitorMenu.setEnabled(false);
+        exploreMenu.setEnabled(false);
+        
+        // Clear main region.
+        VerticalLayout region = (VerticalLayout)mapp.getUIReference(CarbonMainLayout.UI_REGION_ID);
+        region.removeAllComponents();                
+    }
+    
 
     /**
      * Connect to server command behavior to be attached to 'Connect'
@@ -139,7 +147,9 @@ public class ConnectActor implements Button.ClickListener, FieldEvents.TextChang
         
         // Enable menu bar items.
         MainApplication mapp = (MainApplication)dialogWin.getApplication();
+        MenuItem monitorMenu = (MenuItem)mapp.getUIReference(MainMenuBar.UI_MONITOR_ID);
         MenuItem exploreMenu = (MenuItem)mapp.getUIReference(MainMenuBar.UI_EXPLORE_ID);
+        monitorMenu.setEnabled(true);
         exploreMenu.setEnabled(true);
     }
 
