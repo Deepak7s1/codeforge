@@ -11,12 +11,20 @@ public class BCEventsModuleLayout extends HorizontalSplitPanel {
     public final static String UI_BCEVENTS_LAYOUT_ID = "BCEventsModuleLayout";
 
     private MainApplication mapp;
+    
+    private ListDetailView listDetail;
+    private BCEventsTable eventsTable;
+    
 
     public BCEventsModuleLayout(MainApplication mapp) {
         this.mapp = mapp;
         
         addStyleName(Reindeer.SPLITPANEL_SMALL);
         setSplitPosition(250, Sizeable.UNITS_PIXELS);
+        
+        eventsTable = new BCEventsTable(mapp);
+        listDetail = new ListDetailView(eventsTable, null);
+        setSecondComponent(listDetail);
     }
 
 

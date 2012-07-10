@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import oracle.social.johtaja.model.BCEventDataObject;
+
 import waggle.client.modules.conversation.XConversationModuleClientEvents;
 
 import waggle.common.modules.conversation.enums.XConversationRole;
@@ -31,7 +33,13 @@ public class ConversationModuleEventsListener implements XConversationModuleClie
                    new Object[] { Thread.currentThread().getName(), 
                                   xConversationEnterExitInfo.UserName,
                                   xConversationEnterExitInfo.ConversationName });
+        BCEventDataObject eventObj = new BCEventDataObject();
+        eventObj.setEventName("ConversationEntered");
+        eventObj.setEventType("CONVERSATION_EVENT_TYPE");        
+        eventObj.setEventDescription(xConversationEnterExitInfo.UserName + " entered conversation.");
+        BackChannelEventsRegistry.getInstance().notifyEventConsumers(eventObj);
     }
+
 
     public void notifyConversationExiting(XConversationEnterExitInfo xConversationEnterExitInfo) {
     }
@@ -41,6 +49,11 @@ public class ConversationModuleEventsListener implements XConversationModuleClie
                    new Object[] { Thread.currentThread().getName(), 
                                   xConversationEnterExitInfo.UserName,
                                   xConversationEnterExitInfo.ConversationName });
+        BCEventDataObject eventObj = new BCEventDataObject();
+        eventObj.setEventName("ConversationExited");
+        eventObj.setEventType("CONVERSATION_EVENT_TYPE");
+        eventObj.setEventDescription(xConversationEnterExitInfo.UserName + " exited conversation.");
+        BackChannelEventsRegistry.getInstance().notifyEventConsumers(eventObj);
     }
 
     public void notifyConversationCreated(XConversationInfo xConversationInfo) {
@@ -78,5 +91,9 @@ public class ConversationModuleEventsListener implements XConversationModuleClie
 
     public void notifyConversationMembershipChanged(XConversationInfo xConversationInfo, List<XUserInfo> list,
                                                     List<XUserInfo> list1) {
+    }
+
+    public void notifyConversationShowMembershipMessagesChanged(XConversationInfo xConversationInfo,
+                                                                Boolean boolean1) {
     }
 }

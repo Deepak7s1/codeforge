@@ -57,7 +57,7 @@ public class UsersContainer extends BeanItemContainer<UserDataObject> implements
             addItem(user);
         }
         
-        new BackgroundThread().start();
+        //new BackgroundThread().start();
     }
 
 
@@ -65,7 +65,7 @@ public class UsersContainer extends BeanItemContainer<UserDataObject> implements
         return mapp.getServiceFactory().getUserModuleService();
     }
 
-
+    // TODO: remove after testing
     public class BackgroundThread extends Thread {
         
         final int MAX_TIMES = 20;

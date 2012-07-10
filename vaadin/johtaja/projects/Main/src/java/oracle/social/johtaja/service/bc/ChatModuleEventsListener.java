@@ -39,4 +39,7 @@ public class ChatModuleEventsListener  implements XChatModuleClientEvents {
 
     public void notifyChatsAllUnread(XObjectID xObjectID, int i) {
     }
+
+    public void notifyConversationsAllRead() {
+    }
 }

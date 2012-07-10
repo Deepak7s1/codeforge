@@ -16,6 +16,8 @@ import oracle.social.johtaja.carbon.view.ConnectSubWindow;
 import oracle.social.johtaja.carbon.view.MainMenuBar;
 import oracle.social.johtaja.service.ServerSession;
 import oracle.social.johtaja.service.ServiceFactory;
+import oracle.social.johtaja.service.bc.BackChannelEventConsumer;
+import oracle.social.johtaja.service.bc.BackChannelEventsRegistry;
 
 
 public class MainApplication extends Application 
@@ -120,8 +122,18 @@ public class MainApplication extends Application
     @Override
     public void windowClose(Window.CloseEvent e) {
         logger.log(DEBUG, "Closing the application.");
+        deregisterBCEventConsumers();
         close();
     }
     
+    
+    private void deregisterBCEventConsumers() {
+        for (Object uiObj : uiReg.values()) {
+            if (uiObj instanceof BackChannelEventConsumer) {
+                BackChannelEventConsumer consumer = (BackChannelEventConsumer)uiObj;
+                BackChannelEventsRegistry.getInstance().removeEventConsumer(consumer.getConsumerId());
+            }
+        }
+    }
     
 }

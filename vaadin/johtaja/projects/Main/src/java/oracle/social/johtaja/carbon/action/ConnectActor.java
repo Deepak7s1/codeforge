@@ -2,8 +2,6 @@ package oracle.social.johtaja.carbon.action;
 
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.MenuBar;
-
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.ProgressIndicator;
@@ -14,6 +12,7 @@ import com.vaadin.ui.Window.Notification;
 import java.util.logging.Logger;
 
 import oracle.social.johtaja.app.MainApplication;
+import oracle.social.johtaja.carbon.view.BCEventsTable;
 import oracle.social.johtaja.carbon.view.CarbonMainLayout;
 import oracle.social.johtaja.carbon.view.ConnectSubWindow;
 import oracle.social.johtaja.carbon.view.MainMenuBar;
@@ -111,14 +110,32 @@ public class ConnectActor implements Button.ClickListener, FieldEvents.TextChang
         MenuItem monitorMenu = (MenuItem)mapp.getUIReference(MainMenuBar.UI_MONITOR_ID);
         MenuItem exploreMenu = (MenuItem)mapp.getUIReference(MainMenuBar.UI_EXPLORE_ID);
         
-        connectItem.setEnabled(true);
-        disconnectItem.setEnabled(false);
-        monitorMenu.setEnabled(false);
-        exploreMenu.setEnabled(false);
+        if (connectItem != null) { connectItem.setEnabled(true); }
+        if (disconnectItem != null) { disconnectItem.setEnabled(false); }
+        if (monitorMenu != null) { monitorMenu.setEnabled(false); }
+        if (exploreMenu != null) { exploreMenu.setEnabled(false); }
         
+        // Clear some application state.
+        clearActorState(mapp);
+    }
+    
+    
+    /**
+     * Some UI state needs to be cleared or reverted when a user disconnects from
+     * the server.
+     */
+    private void clearActorState(MainApplication mapp) {
         // Clear main region.
         VerticalLayout region = (VerticalLayout)mapp.getUIReference(CarbonMainLayout.UI_REGION_ID);
-        region.removeAllComponents();                
+        if (region != null) {
+            region.removeAllComponents();
+        }
+
+        // Clear items in BC events table.        
+        BCEventsTable eventsTable = (BCEventsTable)mapp.getUIReference(BCEventsTable.UI_TABLE_ID);
+        if (eventsTable != null) {
+            eventsTable.getDataSource().removeAllItems();
+        }
     }
     
 

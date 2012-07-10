@@ -64,7 +64,7 @@ public class ConnectSubWindow extends Window {
             // Server URL field + input prompt
             serverURL = new TextField();
             serverURL.setInputPrompt("http://localhost:8080");
-            serverURL.setValue("http://slc01gbx.us.oracle.com:7001");
+            serverURL.setValue("http://slc02uzr.us.oracle.com:8080");
             serverURL.setColumns(20);
             serverURL.setImmediate(true);
             serverURL.addListener(new ConnectActor(this));

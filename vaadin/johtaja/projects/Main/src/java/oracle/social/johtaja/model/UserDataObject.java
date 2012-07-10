@@ -32,8 +32,8 @@ public class UserDataObject implements Serializable {
         this.userId = xuser.ID.toString();
         this.displayName = xuser.DisplayName;
         this.emailAddress = xuser.EMailAddress;
-        this.enabled = true;
-        this.deleted = false;
+        this.enabled = xuser.Enabled;
+        this.deleted = xuser.Deleted;
     }
 
     public void setUserId(String userID) {
