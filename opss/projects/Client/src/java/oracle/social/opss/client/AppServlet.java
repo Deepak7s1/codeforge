@@ -20,12 +20,11 @@ import waggle.core.api.XAPI;
  * Example Servlet URL:
  *
  * http(s)://host:port/opss/appservlet?_u=james&_s=bond&_prot=http&_host=127.0.0.1&_port=8080&_path=osn
- * http(s)://host:port/opss/appservlet?_opss&_u=james&_prot=http&_host=127.0.0.1&_port=8080&_path=osn
+ * http(s)://host:port/opss/appservlet?_prot=http&_host=127.0.0.1&_port=8080&_path=osn
  *
  * Valid GET parameters:
- * 1. _u : the username
- * 2. _s : the password (only needed if _opss is not specified)
- * 3. _opss : parameter presence indicates OPSS Trust Service should be used
+ * 1. _u : the username (not needed for OAM/SSO authenticated request)
+ * 2. _s : the password (not needed for OAM/SSO authenticated request)
  * 4. _prot : 'http' or 'https'
  * 5. _host : OSN server hostname
  * 6. _port : OSN server portnum
@@ -36,7 +35,6 @@ public class AppServlet extends HttpServlet {
         
     private final String username = "_u";
     private final String password = "_s";
-    private final String isTrustService = "_opss";
     private final String osnHost = "_host";
     private final String osnPort = "_port";
     private final String osnProtocol = "_prot";
@@ -55,20 +53,7 @@ public class AppServlet extends HttpServlet {
         out.println("<head><title>AppServlet</title></head>");
         out.println("<body>");
         
-        // Prepare connection parameters.
-        Map<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put(username, request.getParameter(username) != null ? request.getParameter(username) : "");
-        paramMap.put(password, request.getParameter(password) != null ? request.getParameter(password) : "");
-        paramMap.put(isTrustService, request.getParameter(isTrustService) != null ?  "true": "false");
-        paramMap.put(osnHost, request.getParameter(osnHost) != null ? request.getParameter(osnHost) : "localhost");
-        paramMap.put(osnPort, request.getParameter(osnPort) != null ? request.getParameter(osnPort) : "7001");
-        paramMap.put(osnProtocol, request.getParameter(osnProtocol) != null ? request.getParameter(osnProtocol) : "http");
-        paramMap.put(osnContextPath, request.getParameter(osnContextPath) != null ? "/" + request.getParameter(osnContextPath) : "/osn");
-        paramMap.put(osnURL, paramMap.get(osnProtocol) + "://" + paramMap.get(osnHost) + ":" + paramMap.get(osnPort));
-        printParamMap(paramMap, out);
-        
-        
-        XAPI xapi = connect(paramMap, out);
+        XAPI xapi = connect(request, out);
         
         if (xapi != null) {
             // Make OSN call to get some diagnostic data.
@@ -87,30 +72,33 @@ public class AppServlet extends HttpServlet {
     }
     
     
-    private void printParamMap(Map<String, String> paramMap, PrintWriter out) {
-        StringBuffer sb = new StringBuffer("<p>");
-        sb.append(username + " = " + paramMap.get(username)).append("<br/>");
-        sb.append(password + " = " + paramMap.get(password)).append("<br/>");
-        sb.append(isTrustService + " = " + paramMap.get(isTrustService)).append("<br/>");
-        sb.append(osnURL + " = " + paramMap.get(osnURL)).append("<br/>");
-        sb.append(osnContextPath + " = " + paramMap.get(osnContextPath)).append("<br/></p>");
-        out.println(sb.toString());
-    }
-    
-    
     /**
      * Connect to the OSN service.
-     * @param paramMap connection parameters obtained and parsed from the servlet request
+     * @param request the servlet request
      * @param out PrintWriter
      */
-    private XAPI connect(Map<String, String> paramMap, PrintWriter out) {
+    private XAPI connect(HttpServletRequest request, PrintWriter out) {
+        // Prepare connection parameters.
+        Map<String, String> paramMap = new HashMap<String, String>();
+        paramMap.put(username, request.getParameter(username) != null ? request.getParameter(username) : "");
+        paramMap.put(password, request.getParameter(password) != null ? request.getParameter(password) : "");
+        paramMap.put(osnHost, request.getParameter(osnHost) != null ? request.getParameter(osnHost) : "localhost");
+        paramMap.put(osnPort, request.getParameter(osnPort) != null ? request.getParameter(osnPort) : "7001");
+        paramMap.put(osnProtocol, request.getParameter(osnProtocol) != null ? request.getParameter(osnProtocol) : "http");
+        paramMap.put(osnContextPath, request.getParameter(osnContextPath) != null ? "/" + request.getParameter(osnContextPath) : "/osn");
+        paramMap.put(osnURL, paramMap.get(osnProtocol) + "://" + paramMap.get(osnHost) + ":" + paramMap.get(osnPort));
+        printParamMap(paramMap, out);
+
+        
         XAPISession xapiSess = new XAPISession();
         try {
             xapiSess.configureConnection(paramMap.get(osnURL), 
                                          paramMap.get(osnContextPath));
             
-            if (Boolean.parseBoolean(paramMap.get(isTrustService))) {
-                xapiSess.serviceLogin(paramMap.get(username));
+            // If the request is already OAM/SSO authenticated, the user principal 
+            // should be available in the request.  Use this to access OSN service.
+            if (request.getUserPrincipal() != null) {
+                xapiSess.serviceLogin(request.getUserPrincipal().getName());
                 out.println("Successfully logged in to OSN using TrustService as " + xapiSess.getCurrentLoginUsername());
             }
             else {
@@ -125,6 +113,21 @@ public class AppServlet extends HttpServlet {
             return null;
         }        
         return xapiSess.getXAPI();
+    }
+    
+    
+    /**
+     * Print out the relevant GET parameters and their values.
+     * @param paramMap the parameter map
+     * @param out PrintWriter
+     */
+    private void printParamMap(Map<String, String> paramMap, PrintWriter out) {
+        StringBuffer sb = new StringBuffer("<p>");
+        sb.append(username + " = " + paramMap.get(username)).append("<br/>");
+        sb.append(password + " = " + paramMap.get(password)).append("<br/>");
+        sb.append(osnURL + " = " + paramMap.get(osnURL)).append("<br/>");
+        sb.append(osnContextPath + " = " + paramMap.get(osnContextPath)).append("<br/></p>");
+        out.println(sb.toString());
     }
     
     

@@ -19,6 +19,5 @@
    </hash>
    <list n="listOfChildren">
       <hash><url n="URL" path="projects/Client/Client.jpr"/></hash>
-      <hash><url n="URL" path="projects/Server/Server.jpr"/></hash>
    </list>
 </jws:workspace>

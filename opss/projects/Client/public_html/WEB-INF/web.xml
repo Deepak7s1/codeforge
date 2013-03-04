@@ -9,22 +9,15 @@
   </listener>
 
   <servlet>
-    <display-name>OPSS Client</display-name>
-    <servlet-name>Client</servlet-name>
-    <servlet-class>oracle.social.opss.client.Client</servlet-class>
-  </servlet>
-  <servlet>
     <servlet-name>AppServlet</servlet-name>
     <servlet-class>oracle.social.opss.client.AppServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>Client</servlet-name>
-    <url-pattern>/Client</url-pattern>
-  </servlet-mapping>
+
   <servlet-mapping>
     <servlet-name>AppServlet</servlet-name>
     <url-pattern>/appservlet</url-pattern>
   </servlet-mapping>
+
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>

@@ -113,7 +113,6 @@ public class XAPISession {
      */
     public void serviceLogin(String username) throws Exception {
 
-        XLoginInfo xLoginInfo = null;
         try {
             // Perform login.
             String token = TrustServiceClient.getSecurityToken(username);
