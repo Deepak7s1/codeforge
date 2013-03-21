@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="ons" default="build" basedir=".">
+
+    <!-- Exclude extra directory created by version control and IDE. -->
+    <defaultexcludes add="**/.git/**"/>
+    <defaultexcludes add="**/.gitignore"/>
+    <defaultexcludes add="**/*.iml"/>
+
+    <property environment="env"/> <!-- ** env var imports (properties prefixed with env.) -->
+    <property file="build.properties"/>
+
+    <property name="project.name" value="osn"/>
+    <property name="project.owner.uid" value="adrian.infinitum"/>
+    <property name="project.owner.email" value="adrian.infinitum@gmail.com"/>
+
+
+    <property name="path.to.lib" location="lib"/>
+    <property name="path.to.build" location="build"/>
+    <property name="path.to.resources" location="resources"/>
+    <property name="path.to.classes" location="${path.to.build}/classes"/>
+    <property name="path.to.deploy" location="${path.to.build}/deploy"/>
+    <property name="module.osn-seed.src" location="seed/src/java"/>
+
+
+    <target name="clean">
+        <delete dir="${path.to.build}"/>
+    </target>
+
+    <target name="build" depends="init, compile, package">
+    </target>
+
+    <target name="init">
+        <mkdir dir="${path.to.classes}"/>
+    </target>
+
+    
+    <target name="prepare.compile.classpath">
+        <fileset id="fileset-waggle-sdk" dir="${path.to.lib}/waggle-sdk"
+                 includes="*.jar"/>
+
+        <path id="compile.classpath">
+            <fileset refid="fileset-waggle-sdk"/>
+        </path>
+    </target>
+
+    <target name="prepare.runtime.classpath">
+        <fileset id="fileset-waggle-sdk" dir="${path.to.lib}/waggle-sdk"
+                 includes="*.jar"/>
+        <fileset id="fileset-my-jars" dir="${path.to.deploy}"
+                 includes="*.jar"/>
+
+        <path id="runtime.classpath">
+            <fileset refid="fileset-my-jars"/>
+            <fileset refid="fileset-waggle-sdk"/>
+        </path>
+    </target>
+
+
+    <target name="compile" depends="prepare.compile.classpath">
+        <property name="compile.nowarn" value="off"/>
+        <property name="compile.optimize" value="off"/>
+        <property name="compile.debug" value="lines,vars,source"/>
+        <property name="compile.deprecation" value="on"/>
+        <property name="compile.args" value="-Xlint:-unchecked"/>
+
+        <javac destdir="${path.to.classes}" debug="on"
+               debuglevel="${compile.debug}" optimize="${compile.optimize}"
+               nowarn="${compile.nowarn}" deprecation="${compile.deprecation}">
+            <classpath refid="compile.classpath"/>
+            <compilerarg value="${compile.args}"/>
+            <src location="${module.osn-seed.src}"/>
+        </javac>
+    </target>
+
+
+    <target name="package">
+        <jar destfile="${path.to.deploy}/osn-test.jar">
+            <fileset dir="${path.to.classes}">
+                <include name="**/*.class"/>
+            </fileset>
+            <fileset dir="${path.to.resources}">
+                <include name="**/*.properties"/>
+            </fileset>
+        </jar>
+    </target>
+
+
+    <macrodef name="seed.runner">
+        <attribute name="osn.url" default="http://localhost:8080" />
+        <attribute name="osn.user" default="user1" />
+        <attribute name="osn.password" default="waggle" />
+
+        <sequential>
+            <java classname="org.adinfinitum.osn.seed.OSNSeederMain" fork="true" failonerror="true" maxmemory="128m">
+                <classpath refid="runtime.classpath"/>
+                <arg line="@{osn.url} @{osn.user} @{osn.password}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+
+    <target name="seed.osn" depends="prepare.runtime.classpath">
+        <seed.runner osn.url="http://slc02xih.us.oracle.com:8080" osn.user="user1" osn.password="waggle"/>
+    </target>
+
+</project>
