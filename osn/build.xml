@@ -101,7 +101,7 @@
 
 
     <target name="seed.osn" depends="prepare.runtime.classpath">
-        <seed.runner osn.url="http://slc02xih.us.oracle.com:8080" osn.user="user1" osn.password="waggle"/>
+        <seed.runner osn.url="http://slc02xih.us.oracle.com:8080" osn.user="user2" osn.password="waggle"/>
     </target>
 
 </project>
