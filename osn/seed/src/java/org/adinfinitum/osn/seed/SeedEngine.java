@@ -1,9 +1,10 @@
 package org.adinfinitum.osn.seed;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.adinfinitum.osn.seed.config.Collection;
+import org.adinfinitum.osn.seed.config.SeedConfiguration;
 import org.adinfinitum.osn.seed.module.ConversationsModule;
 import org.adinfinitum.osn.seed.util.RandomTextGenerator;
 
@@ -12,10 +13,9 @@ import waggle.core.id.XObjectID;
 
 
 public class SeedEngine {
-    private final static Logger logger = Logger.getLogger(SeedEngine.class.getName());
+    private static final Logger logger = Logger.getLogger(SeedEngine.class.getName());
 
-    private final static int NUM_OF_COLLECTIONS = 15;
-    private final static int NUM_OF_CONVERSATIONS_PER_COLLECTION = 20;
+    private Collection collConf = SeedConfiguration.getInstance().getCollectionConfig();
 
     private static final SeedEngine _instance = new SeedEngine();
     private SeedEngine() {
@@ -38,10 +38,11 @@ public class SeedEngine {
         // Determine how many collections are already in the system.
         // If less than NUM_OF_COLLECTIONS, create the remaining.
         //
-        List<XObjectID> collectionIDs = ConversationsModule.getInstance().getCollections(xapi, NUM_OF_COLLECTIONS);
+        List<XObjectID> collectionIDs = ConversationsModule.getInstance().getCollections(xapi,
+                                        collConf.getNumberOfCollections());
 
 
-        int numCollectionsToCreate = NUM_OF_COLLECTIONS - collectionIDs.size();
+        int numCollectionsToCreate = collConf.getNumberOfCollections() - collectionIDs.size();
         if (numCollectionsToCreate > 0) {
             // Create collections.
             logger.info("Creating collections...");
@@ -58,9 +59,11 @@ public class SeedEngine {
         // If less than NUM_OF_CONVERSATIONS_PER_COLLECTION, create the remaining.
         //
         for (XObjectID collId : collectionIDs) {
-            List<XObjectID> conversationIDs = ConversationsModule.getInstance().getConversationsInCollection(xapi, collId, NUM_OF_CONVERSATIONS_PER_COLLECTION);
-            int numConversationsToCreate = NUM_OF_CONVERSATIONS_PER_COLLECTION - conversationIDs.size();
+            List<XObjectID> conversationIDs = ConversationsModule.getInstance().getConversationsInCollection(xapi,
+                                              collId, collConf.getNumberOfConversationsPerCollection());
 
+
+            int numConversationsToCreate = collConf.getNumberOfConversationsPerCollection() - conversationIDs.size();
             if (numConversationsToCreate > 0) {
                 // Create related Conversations.
                 logger.info("Creating related Conversations for collection " + collId + "...");

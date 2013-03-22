@@ -36,22 +36,28 @@
 
     
     <target name="prepare.compile.classpath">
+        <fileset id="fileset-utils" dir="${path.to.lib}/utils"
+                 includes="*.jar"/>
         <fileset id="fileset-waggle-sdk" dir="${path.to.lib}/waggle-sdk"
                  includes="*.jar"/>
 
         <path id="compile.classpath">
+            <fileset refid="fileset-utils"/>
             <fileset refid="fileset-waggle-sdk"/>
         </path>
     </target>
 
     <target name="prepare.runtime.classpath">
-        <fileset id="fileset-waggle-sdk" dir="${path.to.lib}/waggle-sdk"
-                 includes="*.jar"/>
         <fileset id="fileset-my-jars" dir="${path.to.deploy}"
+                 includes="*.jar"/>
+        <fileset id="fileset-utils" dir="${path.to.lib}/utils"
+                 includes="*.jar"/>
+        <fileset id="fileset-waggle-sdk" dir="${path.to.lib}/waggle-sdk"
                  includes="*.jar"/>
 
         <path id="runtime.classpath">
             <fileset refid="fileset-my-jars"/>
+            <fileset refid="fileset-utils"/>
             <fileset refid="fileset-waggle-sdk"/>
         </path>
     </target>
@@ -80,6 +86,7 @@
                 <include name="**/*.class"/>
             </fileset>
             <fileset dir="${path.to.resources}">
+                <include name="**/*.xml"/>
                 <include name="**/*.properties"/>
             </fileset>
         </jar>
@@ -87,21 +94,16 @@
 
 
     <macrodef name="seed.runner">
-        <attribute name="osn.url" default="http://localhost:8080" />
-        <attribute name="osn.user" default="user1" />
-        <attribute name="osn.password" default="waggle" />
-
         <sequential>
             <java classname="org.adinfinitum.osn.seed.OSNSeederMain" fork="true" failonerror="true" maxmemory="128m">
                 <classpath refid="runtime.classpath"/>
-                <arg line="@{osn.url} @{osn.user} @{osn.password}"/>
             </java>
         </sequential>
     </macrodef>
 
 
     <target name="seed.osn" depends="prepare.runtime.classpath">
-        <seed.runner osn.url="http://slc02xih.us.oracle.com:8080" osn.user="user2" osn.password="waggle"/>
+        <seed.runner/>
     </target>
 
 </project>

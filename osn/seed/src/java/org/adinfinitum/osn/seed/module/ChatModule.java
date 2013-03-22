@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 
 public class ChatModule {
-    private final static Logger logger = Logger.getLogger(ChatModule.class.getName());
+    private static final Logger logger = Logger.getLogger(ChatModule.class.getName());
 
     private static final ChatModule _instance = new ChatModule();
     private ChatModule() {

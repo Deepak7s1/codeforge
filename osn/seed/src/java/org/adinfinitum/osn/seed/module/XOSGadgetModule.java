@@ -10,8 +10,8 @@ import waggle.core.id.XObjectID;
 
 
 public class XOSGadgetModule {
-    private final static Logger logger = Logger.getLogger(XOSGadgetModule.class.getName());
-    private final static String WAGGLE_COLLECTION_EXTERNALID = "waggle.CollectionGadget";
+    private static final Logger logger = Logger.getLogger(XOSGadgetModule.class.getName());
+    private static final String WAGGLE_COLLECTION_EXTERNALID = "waggle.CollectionGadget";
 
     private static final XOSGadgetModule _instance = new XOSGadgetModule();
     private XOSGadgetModule() {

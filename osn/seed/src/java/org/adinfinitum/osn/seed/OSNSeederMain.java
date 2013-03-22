@@ -1,9 +1,11 @@
 package org.adinfinitum.osn.seed;
 
 import java.lang.String;
-import java.lang.System;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.adinfinitum.osn.seed.config.Connector;
+import org.adinfinitum.osn.seed.config.SeedConfiguration;
 
 import waggle.client.main.XClientMain;
 import waggle.common.modules.connect.XConnectModule;
@@ -20,20 +22,21 @@ import waggle.core.api.XAPIManager;
  *        http://localhost:8080 user1 waggle
  */
 public class OSNSeederMain {
-    private final static Logger logger = Logger.getLogger(OSNSeederMain.class.getName());
+    private static final Logger logger = Logger.getLogger(OSNSeederMain.class.getName());
 
     public static void main(String... args) {
-        checkArgs(args);
+        Connector connector = SeedConfiguration.getInstance().getConnectorConfig();
+        logger.info("Connecting to " + connector.getServerUrl() + connector.getWebContextPath());
 
         XLoginCredentialsInfo loginCredentialsInfo = new XLoginCredentialsInfo();
-        loginCredentialsInfo.UserName = args[1];
-        loginCredentialsInfo.UserPassword = args[2];
+        loginCredentialsInfo.UserName = connector.getLoginUser();
+        loginCredentialsInfo.UserPassword = connector.getLoginPassword();
 
         XAPI xapi = null;
         try {
             XClientMain.initApp();
             xapi = XAPIManager.newInstance();
-            xapi.setSession(args[0], "/osn");
+            xapi.setSession(connector.getServerUrl(), connector.getWebContextPath());
 
             XLoginInfo loginInfo = xapi.call(XConnectModule.Server.class).login(loginCredentialsInfo);
 
@@ -55,15 +58,6 @@ public class OSNSeederMain {
                 xapi.call(XConnectModule.Server.class).logout();
             }
             XClientMain.shutdown();
-        }
-    }
-
-
-    private static void checkArgs(String... args) {
-        if(args.length < 3) {
-            logger.info("Required Parameters: {base URL} {username} {password}");
-            logger.info("Usage: java -classpath {waggle-sdk libraries} org.adinfinitum.osn.seed.OSNSeederMain http://localhost:8080 user1 waggle");
-            System.exit(1);
         }
     }
 

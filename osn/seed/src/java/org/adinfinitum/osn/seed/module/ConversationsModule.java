@@ -16,7 +16,7 @@ import waggle.core.id.XObjectID;
 
 
 public class ConversationsModule {
-    private final static Logger logger = Logger.getLogger(ConversationsModule.class.getName());
+    private static final Logger logger = Logger.getLogger(ConversationsModule.class.getName());
 
     private static final ConversationsModule _instance = new ConversationsModule();
     private ConversationsModule() {
