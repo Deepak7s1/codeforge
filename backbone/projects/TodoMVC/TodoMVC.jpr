@@ -140,7 +140,7 @@
                   </hash>
                </list>
             </hash>
-            <url n="jarURL" path="deploy/todomvc-webapp.war"/>
+            <url n="jarURL" path="../../build/TodoMVC/deploy/todomvc-webapp.war"/>
             <hash n="libraryDependencies">
                <value n="IncludeLibrariesFromOtherContainers" v="true"/>
             </hash>

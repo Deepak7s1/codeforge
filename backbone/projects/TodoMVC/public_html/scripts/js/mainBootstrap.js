@@ -22,6 +22,7 @@ require([
 ],
 
 function(TodoApp, TodoRouter) {
+
     // This function is called when all the required modules are loaded.
     // If a module calls define(), then this function is not fired until
     // the module's dependencies have loaded.
@@ -35,5 +36,5 @@ function(TodoApp, TodoRouter) {
         Backbone.history.loadUrl(Backbone.history.getHash());
     }
 
-    var app = new TodoApp( { todoRouter : router } );
+    var app = new TodoApp();
 });
