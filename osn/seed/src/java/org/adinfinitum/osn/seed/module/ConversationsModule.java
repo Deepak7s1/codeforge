@@ -30,6 +30,7 @@ public class ConversationsModule {
         return _instance;
     }
 
+
     /**
      * Get all collections up to a maximum limit. Collections that are closed
      * and muted are excluded. Walls are also excluded.
@@ -65,6 +66,7 @@ public class ConversationsModule {
         return conversationIDs;
     }
 
+
     /**
      * Get all Conversations in a collection up to a maximum limit. Conversations
      * that are closed and muted are excluded. Walls are also excluded.
@@ -98,7 +100,6 @@ public class ConversationsModule {
     }
 
 
-
     /**
      * Create a Conversation for the logged in user.
      * @param xapi XAPI
@@ -113,6 +114,7 @@ public class ConversationsModule {
         return conversationInfo.ID;
     }
 
+
     /**
      * Create a Conversation for the logged in user.
      * @param xapi XAPI
@@ -121,11 +123,13 @@ public class ConversationsModule {
      */
     public XObjectID createCollection(XAPI xapi,
                                       String collectionName) {
+        XObjectID collectionGadgetId = XOSGadgetModule.getInstance().getCollectionGadgetId(xapi);
+
         XConversationCreateInfo createInfo = new XConversationCreateInfo();
         createInfo.Name = collectionName;
         createInfo.RelatedToConversationID = null;
         createInfo.PrimaryExternalID = null;
-        createInfo.TypeGadgetID = XObjectID.valueOf(10125);  // TODO: hardcoded gadgetID
+        createInfo.TypeGadgetID = collectionGadgetId;
         XConversationInfo collectionInfo = xapi.call(XConversationModule.Server.class).createConversationFromInfo(createInfo);
         return collectionInfo.ID;
     }
