@@ -34,9 +34,20 @@ public class SeedEngine {
      * @param xapi XAPI
      */
     public void start(XAPI xapi) {
+        this.seedCollections(xapi);
+        this.seedMessages(xapi);
+    }
+
+
+    /**
+     * Seed OSN with a bunch of collections and related conversations
+     * in the each collection.
+     * @param xapi XAPI
+     */
+    private void seedCollections(XAPI xapi) {
         //
         // Determine how many collections are already in the system.
-        // If less than NUM_OF_COLLECTIONS, create the remaining.
+        // If less than number of collections to be seeded, create the remaining.
         //
         List<XObjectID> collectionIDs = ConversationsModule.getInstance().getCollections(xapi,
                                         collConf.getNumberOfCollections());
@@ -55,8 +66,8 @@ public class SeedEngine {
         }
 
         //
-        // Determine number of related conversations in ecah collection.
-        // If less than NUM_OF_CONVERSATIONS_PER_COLLECTION, create the remaining.
+        // Determine number of related conversations in each collection.
+        // If less than number required to be seeded, create the remaining.
         //
         for (XObjectID collId : collectionIDs) {
             List<XObjectID> conversationIDs = ConversationsModule.getInstance().getConversationsInCollection(xapi,
@@ -75,8 +86,14 @@ public class SeedEngine {
             }
             sleep(200);
         }
+    }
 
 
+    /**
+     * Seed conversations with a bunch of messages and replies to messages.
+     * @param xapi XAPI
+     */
+    private void seedMessages(XAPI xapi) {
         // TODO: add messages to conversations.
     }
 
