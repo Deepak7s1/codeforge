@@ -1,17 +1,25 @@
 package org.adinfinitum.osn.seed;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.adinfinitum.osn.seed.config.Collection;
 import org.adinfinitum.osn.seed.config.SeedConfiguration;
-import org.adinfinitum.osn.seed.module.ConversationsModule;
+import org.adinfinitum.osn.seed.module.ConversationModule;
+import org.adinfinitum.osn.seed.module.TrackableModule;
+import org.adinfinitum.osn.seed.module.UserModule;
 import org.adinfinitum.osn.seed.util.RandomTextGenerator;
 
+import waggle.common.modules.conversation.infos.XConversationInfo;
+import waggle.common.modules.user.infos.XUserInfo;
 import waggle.core.api.XAPI;
 import waggle.core.id.XObjectID;
 
-
+/**
+ * This is the main class that seeds OSN with collections,
+ * conversations, chat messages, etc.
+ */
 public class SeedEngine {
     private static final Logger logger = Logger.getLogger(SeedEngine.class.getName());
 
@@ -34,8 +42,32 @@ public class SeedEngine {
      * @param xapi XAPI
      */
     public void start(XAPI xapi) {
+        this.seedUsers(xapi);
         this.seedCollections(xapi);
         this.seedMessages(xapi);
+    }
+
+    /**
+     * Seed OSN with a bunch of users.
+     * @param xapi XAPI
+     */
+    private void seedUsers(XAPI xapi) {
+        UserModule userModule = UserModule.getInstance();
+        final int numUsers = 10;  // TODO: make configurable.
+
+        // Create a set of test users.
+        logger.info("~~~~~~~~~~~~~~ Creating test users...");
+        userModule.createTestUsers(xapi, numUsers);
+        List<XUserInfo> seededUsers = userModule.getAllTestUsers(xapi, numUsers);
+
+        // Create user profile pics.
+        logger.info("~~~~~~~~~~~~~~ Adding user profile pics...");
+        int index = 1;
+        for (XUserInfo user : seededUsers) {
+            userModule.createProfilePic(xapi, user.ID, index);
+            index++;
+            sleep(100);
+        }
     }
 
 
@@ -45,33 +77,39 @@ public class SeedEngine {
      * @param xapi XAPI
      */
     private void seedCollections(XAPI xapi) {
+        UserModule userModule = UserModule.getInstance();
+        ConversationModule convModule = ConversationModule.getInstance();
+        TrackableModule trackModule = TrackableModule.getInstance();
+
         //
         // Determine how many collections are already in the system.
         // If less than number of collections to be seeded, create the remaining.
         //
-        List<XObjectID> collectionIDs = ConversationsModule.getInstance().getCollections(xapi,
-                                        collConf.getNumberOfCollections());
+        List<XObjectID> collectionIDs = convModule.getCollections(xapi,
+                collConf.getNumberOfCollections());
 
 
+        logger.info("~~~~~~~~~~~~~~ Creating collections...");
         int numCollectionsToCreate = collConf.getNumberOfCollections() - collectionIDs.size();
         if (numCollectionsToCreate > 0) {
             // Create collections.
-            logger.info("Creating collections...");
             for (int i=0; i < numCollectionsToCreate; i++) {
-                collectionIDs.add(ConversationsModule.getInstance().
+                collectionIDs.add(convModule.
                         createCollection(xapi, RandomTextGenerator.genConversationTitle("Coll-" + i + ":")));
             }
             logger.info(numCollectionsToCreate + " collections created.");
-            sleep(200);
+            sleep(100);
         }
 
         //
         // Determine number of related conversations in each collection.
         // If less than number required to be seeded, create the remaining.
         //
+        logger.info("~~~~~~~~~~~~~~ Creating related conversations...");
         for (XObjectID collId : collectionIDs) {
-            List<XObjectID> conversationIDs = ConversationsModule.getInstance().getConversationsInCollection(xapi,
-                                              collId, collConf.getNumberOfConversationsPerCollection());
+            // Get conversation IDs in a collection.
+            List<XObjectID> conversationIDs = convModule.getConversationsInCollection(xapi,
+                    collId, collConf.getNumberOfConversationsPerCollection());
 
 
             int numConversationsToCreate = collConf.getNumberOfConversationsPerCollection() - conversationIDs.size();
@@ -79,12 +117,34 @@ public class SeedEngine {
                 // Create related Conversations.
                 logger.info("Creating related Conversations for collection " + collId + "...");
                 for (int j=0; j < numConversationsToCreate; j++) {
-                    conversationIDs.add(ConversationsModule.getInstance().
-                        createConversation(xapi, collId, RandomTextGenerator.genConversationTitle("Related Conv-" + j + ":")));
+                    conversationIDs.add(
+                        convModule.createConversation(xapi, collId,
+                                RandomTextGenerator.genConversationTitle("Conv-" + j + ":")));
                 }
-                logger.info(numConversationsToCreate + " related Conversations created for collection " + collId + ".");
+                logger.info(numConversationsToCreate +
+                            " related Conversations created for collection " + collId + ".");
+                sleep(100);
             }
-            sleep(200);
+        }
+
+
+        // Get the list of user IDs.
+        final int numUsers = 10;  // TODO: make configurable.
+        List<XUserInfo> seededUsers = userModule.getAllTestUsers(xapi, numUsers);
+        List<XObjectID> userIdList = new ArrayList<XObjectID>(seededUsers.size());
+        for (XUserInfo userInfo : seededUsers) {
+            userIdList.add(userInfo.ID);
+        }
+
+        // Add users to the collections and conversations.
+        logger.info("~~~~~~~~~~~~~~ Adding members to conversations...");
+        for (XObjectID collId : collectionIDs) {
+            int limitMaxNumber = collConf.getNumberOfConversationsPerCollection();
+            List<XConversationInfo> convList = trackModule.getRelatedConversations(xapi, collId, limitMaxNumber);
+            for (XConversationInfo relatedConv : convList) {
+                convModule.addMembers(xapi, relatedConv.ID, userIdList);
+            }
+            convModule.addMembers(xapi, collId, userIdList);
         }
     }
 

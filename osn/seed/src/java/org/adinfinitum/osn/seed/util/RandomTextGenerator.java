@@ -80,14 +80,15 @@ public class RandomTextGenerator {
             "Restaurant", "BayArea", "Broomfield", "Singapore", "Montreal", "Seattle",
             "Poetic", "Perhaps", "Dictionary", "Rights", "Special", "Alpha", "Bravo",
             "Charlie", "Delta", "Echo", "Foxtrot", "Gamma", "Hotel", "Indigo", "Jaguar",
-            "Kilo", "Lima", "Mamba", "Nitro", "Orange", "Pegasus", "Quintet", "Reindeer",
+            "Kilo", "Lima", "Mamba", "Nitro", "Closure", "Pegasus", "Quintet", "Reindeer",
             "Super", "Trinidad", "Ubiquitous", "Velocity", "Xanadu", "Yellow", "Zebra",
             "Physical", "Hero", "Standpoint", "Browsing", "Employer", "Employee", "Business",
             "Bonus", "Mainstream", "Documentary", "Determine", "Equation", "Future", "University",
             "Abstract", "Grid", "Mental", "Mensa", "Cloud", "Redcloud", "Sunshine", "General",
             "Computing", "Science", "Math", "Literature", "History", "Geography", "Algebra",
-            "Calculus", "Theory", "BigBang", "String", "Astronomy", "Engineering", "Professor",
+            "Calculus", "Theory", "Levitate", "String", "Astronomy", "Engineering", "Professor",
             "Continent", "Radiation", "Omega", "Agent", "Framework", "Variance", "Routine",
+            "Perfunctory", "Verisimilitude","Mordacious", "Cognizance", "Abstergent", "Mignon",
             "\u5317\u7F8E", "\u4E2D\u6587", "\u3059\u3066\u304D\u306A", "\u53EF\u611B\u3089\u3057\u3044"
     };
 

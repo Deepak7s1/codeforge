@@ -86,8 +86,7 @@
                 <include name="**/*.class"/>
             </fileset>
             <fileset dir="${path.to.resources}">
-                <include name="**/*.xml"/>
-                <include name="**/*.properties"/>
+                <include name="**/*"/>
             </fileset>
         </jar>
     </target>

@@ -6,27 +6,30 @@ import java.util.logging.Logger;
 
 import waggle.common.modules.conversation.XConversationModule;
 import waggle.common.modules.conversation.enums.XConversationDetailSortField;
+import waggle.common.modules.conversation.enums.XConversationRole;
 import waggle.common.modules.conversation.infos.XConversationCreateInfo;
 import waggle.common.modules.conversation.infos.XConversationDetailConversationInfo;
 import waggle.common.modules.conversation.infos.XConversationDetailFilterInfo;
 import waggle.common.modules.conversation.infos.XConversationDetailInfo;
 import waggle.common.modules.conversation.infos.XConversationInfo;
+import waggle.common.modules.conversation.infos.XConversationMemberChangeInfo;
+import waggle.common.modules.conversation.infos.XConversationMemberInfo;
 import waggle.core.api.XAPI;
 import waggle.core.id.XObjectID;
 
 
-public class ConversationsModule {
-    private static final Logger logger = Logger.getLogger(ConversationsModule.class.getName());
+public class ConversationModule {
+    private static final Logger logger = Logger.getLogger(ConversationModule.class.getName());
 
-    private static final ConversationsModule _instance = new ConversationsModule();
-    private ConversationsModule() {
+    private static final ConversationModule _instance = new ConversationModule();
+    private ConversationModule() {
     }
 
     /**
      * Get the singleton instance.
      * @return singleton reference
      */
-    public static ConversationsModule getInstance() {
+    public static ConversationModule getInstance() {
         return _instance;
     }
 
@@ -40,7 +43,7 @@ public class ConversationsModule {
      */
     public List<XObjectID> getCollections(XAPI xapi, int maxNumber) {
         XObjectID collectionGadgetId = XOSGadgetModule.getInstance().getCollectionGadgetId(xapi);
-        logger.info("collectionGadgetId = " + collectionGadgetId);
+        //logger.info("collectionGadgetId = " + collectionGadgetId);
 
         // Create the filter.
         XConversationDetailFilterInfo filter = new XConversationDetailFilterInfo();
@@ -132,5 +135,36 @@ public class ConversationsModule {
         createInfo.TypeGadgetID = collectionGadgetId;
         XConversationInfo collectionInfo = xapi.call(XConversationModule.Server.class).createConversationFromInfo(createInfo);
         return collectionInfo.ID;
+    }
+
+
+    /**
+     * Add user members to a Conversation, if they have < userIdList.size() members.
+     * @param xapi XAPI
+     * @param conversationId the ConversationID
+     * @param userIdList the list of user IDs
+     */
+    public void addMembers(XAPI xapi,
+                           XObjectID conversationId,
+                           List<XObjectID> userIdList) {
+        if (userIdList != null && !userIdList.isEmpty()) {
+            List<XConversationMemberInfo> currentMembers =
+                    xapi.call(XConversationModule.Server.class).getConversationDirectMembers(conversationId);
+
+            if (currentMembers != null && currentMembers.size() < userIdList.size()) {
+                boolean errorIfRemovingSelf = false;
+                List<XConversationMemberChangeInfo> changeInfos = new ArrayList<XConversationMemberChangeInfo>(userIdList.size());
+
+                for (XObjectID userId : userIdList) {
+                    XConversationMemberChangeInfo member = new XConversationMemberChangeInfo();
+                    member.MemberID = userId;
+                    member.MemberRole = XConversationRole.CONTRIBUTOR;
+                    changeInfos.add(member);
+                }
+
+                xapi.call(XConversationModule.Server.class).changeConversationMembers(
+                        conversationId, changeInfos, errorIfRemovingSelf);
+            }
+        }
     }
 }
