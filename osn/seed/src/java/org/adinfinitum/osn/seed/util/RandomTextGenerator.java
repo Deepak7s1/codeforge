@@ -1,13 +1,22 @@
 package org.adinfinitum.osn.seed.util;
 
-
 import java.util.Random;
 import java.util.UUID;
+
 
 /**
  * A class that generates random words and texts.
  */
 public class RandomTextGenerator {
+
+    /**
+     * Generate an 8-character unique identifier.
+     * @return the unique identifier
+     */
+    public static String genUniqueId() {
+        return UUID.randomUUID().toString().substring(0,8);
+    }
+
 
     /**
      * Generate a Conversation title.
@@ -21,7 +30,7 @@ public class RandomTextGenerator {
                 sb.append(pp).append(" ");
             }
         }
-        sb.append(genRandomWords(4)).append(UUID.randomUUID().toString().substring(0,8));
+        sb.append(genRandomWords(4));
         return sb.toString();
     }
 
@@ -79,7 +88,7 @@ public class RandomTextGenerator {
             "Hello", "World", "Standard", "Respect", "Rendition", "Miscellaneous",
             "Restaurant", "BayArea", "Broomfield", "Singapore", "Montreal", "Seattle",
             "Poetic", "Perhaps", "Dictionary", "Rights", "Special", "Alpha", "Bravo",
-            "Charlie", "Delta", "Echo", "Foxtrot", "Gamma", "Hotel", "Indigo", "Jaguar",
+            "Charlie", "Delta", "Echo", "Foxtrot", "Gamma", "Justice", "Indigo", "Jaguar",
             "Kilo", "Lima", "Mamba", "Nitro", "Closure", "Pegasus", "Quintet", "Reindeer",
             "Super", "Trinidad", "Ubiquitous", "Velocity", "Xanadu", "Yellow", "Zebra",
             "Physical", "Hero", "Standpoint", "Browsing", "Employer", "Employee", "Business",
@@ -87,18 +96,23 @@ public class RandomTextGenerator {
             "Abstract", "Grid", "Mental", "Mensa", "Cloud", "Redcloud", "Sunshine", "General",
             "Computing", "Science", "Math", "Literature", "History", "Geography", "Algebra",
             "Calculus", "Theory", "Levitate", "String", "Astronomy", "Engineering", "Professor",
-            "Continent", "Radiation", "Omega", "Agent", "Framework", "Variance", "Routine",
+            "Continent", "Multi-threaded", "Omega", "Daemon", "Framework", "Variance", "Routine",
             "Perfunctory", "Verisimilitude","Mordacious", "Cognizance", "Abstergent", "Mignon",
+            "Rudimentary", "Music", "Cantabile", "Fortissimo", "Pianissimo", "Crescendo",
             "\u5317\u7F8E", "\u4E2D\u6587", "\u3059\u3066\u304D\u306A", "\u53EF\u611B\u3089\u3057\u3044"
     };
 
 
     private static final String[] SENTENCES = {
-            "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
-            "Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.",
-            "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.",
-            "A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart. I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine.",
-            "The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog. Junk MTV quiz graced by fox whelps. Bawds jog, flick quartz, vex nymphs.",
+            "The quick, brown fox jumps over a lazy dog.",
+            "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.",
+            "Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+            "Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.",
+            "Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.",
+            "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.",
+            "Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.",
+            "A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.",
+            "I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine.",
             "abc def ghi jkl mno pqrs tuv wxyz ABC DEF GHI JKL MNO PQRS TUV WXYZ !§ $%& /() =?* '<> #|; ²³~ @`´ ©«» ¤¼× {} ",
             "Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus."
     };

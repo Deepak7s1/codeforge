@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import waggle.common.modules.user.XUserModule;
 import waggle.common.modules.user.infos.XUserInfo;
+import waggle.common.modules.user.updaters.XUserUpdater;
 import waggle.core.api.XAPI;
 import waggle.core.api.XAPIInputStream;
 import waggle.core.id.XObjectID;
@@ -32,6 +33,27 @@ public class UserModule {
     }
 
     /**
+     * Get current user info.
+     * @param xapi XAPI
+     */
+    public XUserInfo getMe(XAPI xapi) {
+        return xapi.call(XUserModule.Server.class).getMe();
+    }
+
+
+    /**
+     * Grant a given user 'developer' privileges.
+     * @param xapi XAPI
+     * @param userId the given user ID
+     */
+    public void grantDeveloperRole(XAPI xapi, XObjectID userId) {
+        XUserUpdater updater = new XUserUpdater();
+        updater.put(XUserUpdater.DEVELOPER, Boolean.TRUE);
+        xapi.call(XUserModule.Server.class).updateUser(userId, updater);
+    }
+
+
+    /**
      * Create a bunch of test users 'user1' ... 'userN' with 'waggle' for password.
      * @param xapi XAPI
      * @param numUsers number of users to create
@@ -39,6 +61,7 @@ public class UserModule {
     public void createTestUsers(XAPI xapi, int numUsers) {
         xapi.call(XUserModule.Server.class).createTestUsers("user", 1, numUsers);
     }
+
 
     /**
      * Get the list of XUserInfo pertaining to the test users.
@@ -53,6 +76,7 @@ public class UserModule {
         }
         return userList;
     }
+
 
     /**
      * Create a profile picture for the given user. Identicons are used.

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
   <connector config-class="org.adinfinitum.osn.seed.config.Connector"
-             serverUrl="http://slc02xih.us.oracle.com:8080"
+             serverUrl="http://localhost:8080"
              webContextPath="/osn"
              adminUser="admin" adminPassword="waggle"
              loginUser="admin" loginPassword="waggle">

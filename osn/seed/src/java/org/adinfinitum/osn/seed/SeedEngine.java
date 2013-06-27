@@ -42,10 +42,24 @@ public class SeedEngine {
      * @param xapi XAPI
      */
     public void start(XAPI xapi) {
+        this.initPrivileges(xapi);
         this.seedUsers(xapi);
         this.seedCollections(xapi);
         this.seedMessages(xapi);
     }
+
+    /**
+     * Initialize the current user with the necessary privileges
+     * to perform the following actions.
+     * @param xapi XAPI
+     */
+    private void initPrivileges(XAPI xapi) {
+        logger.info("~~~~~~~~~~~~~~ Init privileges...");
+        UserModule userModule = UserModule.getInstance();
+        XObjectID myId = userModule.getMe(xapi).ID;
+        userModule.grantDeveloperRole(xapi, myId);
+    }
+
 
     /**
      * Seed OSN with a bunch of users.
