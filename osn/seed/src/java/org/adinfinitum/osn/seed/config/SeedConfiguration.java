@@ -24,6 +24,7 @@ public class SeedConfiguration {
 
     XMLConfiguration config = new XMLConfiguration();
     Connector connectorConfig;
+    User userConfig;
     Collection collectionConfig;
 
     private static final SeedConfiguration _instance = new SeedConfiguration();
@@ -72,6 +73,9 @@ public class SeedConfiguration {
         BeanDeclaration decl = new XMLBeanDeclaration(config, getConfigIdentifier(Connector.class));
         connectorConfig = (Connector) BeanHelper.createBean(decl);
 
+        decl = new XMLBeanDeclaration(config, getConfigIdentifier(User.class));
+        userConfig = (User) BeanHelper.createBean(decl);
+
         decl = new XMLBeanDeclaration(config, getConfigIdentifier(Collection.class));
         collectionConfig = (Collection) BeanHelper.createBean(decl);
     }
@@ -89,6 +93,10 @@ public class SeedConfiguration {
 
     public Connector getConnectorConfig() {
         return connectorConfig;
+    }
+
+    public User getUserConfig() {
+        return userConfig;
     }
 
     public Collection getCollectionConfig() {

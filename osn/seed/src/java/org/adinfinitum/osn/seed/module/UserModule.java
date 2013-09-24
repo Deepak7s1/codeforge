@@ -18,7 +18,15 @@ import waggle.core.id.XObjectID;
 
 public class UserModule {
     private static final Logger logger = Logger.getLogger(UserModule.class.getName());
-    private static final String WAGGLE_COLLECTION_EXTERNALID = "waggle.CollectionGadget";
+    static long PIC_COUNT = 0L;
+
+    /**
+     * Get the monotonically incrementing counter.
+     * @return the pic count.
+     */
+    private long getIncrPicCount() {
+        return PIC_COUNT++;
+    }
 
     private static final UserModule _instance = new UserModule();
     private UserModule() {
@@ -82,10 +90,12 @@ public class UserModule {
      * Create a profile picture for the given user. Identicons are used.
      * @param xapi XAPI
      * @param userId the given user ID
-     * @param iconId to indicate the identicon to use (1 to 10).
      */
-    public void createProfilePic(XAPI xapi, XObjectID userId, int iconId) {
+    public void createProfilePic(XAPI xapi, XObjectID userId) {
         try {
+            // We only have 10 icons -- (id1.png to id10.png).
+            long iconId = (getIncrPicCount() % 10) + 1;
+
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             InputStream is = cl.getResourceAsStream("assets/identicon/id" + iconId + ".png");
             int length = getStreamLength(is);

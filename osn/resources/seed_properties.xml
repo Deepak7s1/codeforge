@@ -7,6 +7,9 @@
              loginUser="admin" loginPassword="waggle">
   </connector>
   <seed>
+	<user config-class="org.adinfinitum.osn.seed.config.User"
+	      numberOfUsers="20">
+	</user>
     <collection config-class="org.adinfinitum.osn.seed.config.Collection"
                 numberOfCollections="5"
                 numberOfConversationsPerCollection="5">

@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import org.adinfinitum.osn.seed.config.Collection;
 import org.adinfinitum.osn.seed.config.SeedConfiguration;
+import org.adinfinitum.osn.seed.config.User;
 import org.adinfinitum.osn.seed.module.ConversationModule;
 import org.adinfinitum.osn.seed.module.TrackableModule;
 import org.adinfinitum.osn.seed.module.UserModule;
@@ -23,6 +24,7 @@ import waggle.core.id.XObjectID;
 public class SeedEngine {
     private static final Logger logger = Logger.getLogger(SeedEngine.class.getName());
 
+    private User userConf = SeedConfiguration.getInstance().getUserConfig();
     private Collection collConf = SeedConfiguration.getInstance().getCollectionConfig();
 
     private static final SeedEngine _instance = new SeedEngine();
@@ -54,7 +56,7 @@ public class SeedEngine {
      * @param xapi XAPI
      */
     private void initPrivileges(XAPI xapi) {
-        logger.info("~~~~~~~~~~~~~~ Init privileges...");
+        logger.info("Init privileges...");
         UserModule userModule = UserModule.getInstance();
         XObjectID myId = userModule.getMe(xapi).ID;
         userModule.grantDeveloperRole(xapi, myId);
@@ -67,19 +69,17 @@ public class SeedEngine {
      */
     private void seedUsers(XAPI xapi) {
         UserModule userModule = UserModule.getInstance();
-        final int numUsers = 10;  // TODO: make configurable.
+        final int numUsers = userConf.getNumberOfUsers();
 
         // Create a set of test users.
-        logger.info("~~~~~~~~~~~~~~ Creating test users...");
+        logger.info("Creating " + numUsers + " test users...");
         userModule.createTestUsers(xapi, numUsers);
         List<XUserInfo> seededUsers = userModule.getAllTestUsers(xapi, numUsers);
 
         // Create user profile pics.
-        logger.info("~~~~~~~~~~~~~~ Adding user profile pics...");
-        int index = 1;
+        logger.info("Adding user profile pics...");
         for (XUserInfo user : seededUsers) {
-            userModule.createProfilePic(xapi, user.ID, index);
-            index++;
+            userModule.createProfilePic(xapi, user.ID);
             sleep(100);
         }
     }
@@ -103,7 +103,7 @@ public class SeedEngine {
                 collConf.getNumberOfCollections());
 
 
-        logger.info("~~~~~~~~~~~~~~ Creating collections...");
+        logger.info("Creating collections...");
         int numCollectionsToCreate = collConf.getNumberOfCollections() - collectionIDs.size();
         if (numCollectionsToCreate > 0) {
             // Create collections.
@@ -119,7 +119,7 @@ public class SeedEngine {
         // Determine number of related conversations in each collection.
         // If less than number required to be seeded, create the remaining.
         //
-        logger.info("~~~~~~~~~~~~~~ Creating related conversations...");
+        logger.info("Creating related conversations...");
         for (XObjectID collId : collectionIDs) {
             // Get conversation IDs in a collection.
             List<XObjectID> conversationIDs = convModule.getConversationsInCollection(xapi,
@@ -151,7 +151,7 @@ public class SeedEngine {
         }
 
         // Add users to the collections and conversations.
-        logger.info("~~~~~~~~~~~~~~ Adding members to conversations...");
+        logger.info("Adding members to conversations...");
         for (XObjectID collId : collectionIDs) {
             int limitMaxNumber = collConf.getNumberOfConversationsPerCollection();
             List<XConversationInfo> convList = trackModule.getRelatedConversations(xapi, collId, limitMaxNumber);
