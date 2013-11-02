@@ -5,13 +5,18 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.adinfinitum.osn.seed.config.Collection;
+import org.adinfinitum.osn.seed.config.Connector;
 import org.adinfinitum.osn.seed.config.SeedConfiguration;
 import org.adinfinitum.osn.seed.config.User;
+import org.adinfinitum.osn.seed.module.ContactModule;
 import org.adinfinitum.osn.seed.module.ConversationModule;
 import org.adinfinitum.osn.seed.module.TrackableModule;
 import org.adinfinitum.osn.seed.module.UserModule;
 import org.adinfinitum.osn.seed.util.RandomTextGenerator;
 
+import waggle.common.modules.connect.XConnectModule;
+import waggle.common.modules.connect.infos.XLoginCredentialsInfo;
+import waggle.common.modules.connect.infos.XLoginInfo;
 import waggle.common.modules.conversation.infos.XConversationInfo;
 import waggle.common.modules.user.infos.XUserInfo;
 import waggle.core.api.XAPI;
@@ -24,6 +29,8 @@ import waggle.core.id.XObjectID;
 public class SeedEngine {
     private static final Logger logger = Logger.getLogger(SeedEngine.class.getName());
 
+    private XLoginInfo loginInfo;
+    private Connector connector = SeedConfiguration.getInstance().getConnectorConfig();
     private User userConf = SeedConfiguration.getInstance().getUserConfig();
     private Collection collConf = SeedConfiguration.getInstance().getCollectionConfig();
 
@@ -46,28 +53,78 @@ public class SeedEngine {
     public void start(XAPI xapi) {
         this.initPrivileges(xapi);
         this.seedUsers(xapi);
+        this.seedContacts(xapi);
         this.seedCollections(xapi);
         this.seedMessages(xapi);
     }
 
+
     /**
-     * Initialize the current user with the necessary privileges
-     * to perform the following actions.
+     * Login as the admin user.  The username and password of the admin
+     * user are obtained from the properties xml.
      * @param xapi XAPI
      */
-    private void initPrivileges(XAPI xapi) {
-        logger.info("Init privileges...");
-        UserModule userModule = UserModule.getInstance();
-        XObjectID myId = userModule.getMe(xapi).ID;
-        userModule.grantDeveloperRole(xapi, myId);
+    private void loginAsAdmin(XAPI xapi) {
+        XLoginCredentialsInfo loginCredentialsInfo = new XLoginCredentialsInfo();
+        loginCredentialsInfo.UserName = connector.getLoginUser();
+        loginCredentialsInfo.UserPassword = connector.getLoginPassword();
+
+        loginInfo = xapi.call(XConnectModule.Server.class).login(loginCredentialsInfo);
+        if (loginInfo != null) {
+            xapi.setRandomID(loginInfo.APIRandomID);
+            logger.info(">>>> Login as: " + loginInfo.UserInfo.DisplayName);
+        }
     }
 
 
     /**
-     * Seed OSN with a bunch of users.
+     * Login as a given user.
+     * @param xapi XAPI
+     * @param user XUserInfo of the user to login as.
+     */
+    private void loginAsUser(XAPI xapi, XUserInfo user) {
+        XLoginCredentialsInfo loginCredentialsInfo = new XLoginCredentialsInfo();
+        loginCredentialsInfo.UserName = user.Name;
+        loginCredentialsInfo.UserPassword = "waggle";
+
+        loginInfo = xapi.call(XConnectModule.Server.class).login(loginCredentialsInfo);
+        if (loginInfo != null) {
+            xapi.setRandomID(loginInfo.APIRandomID);
+            logger.info(">>>> Login as: " + loginInfo.UserInfo.DisplayName);
+        }
+    }
+
+
+    /**
+     * Logout as the current user.
+     * @param xapi XAPI
+     */
+    private void logout(XAPI xapi) {
+        logger.info("<<<< Logout as: " + loginInfo.UserInfo.DisplayName);
+        xapi.call(XConnectModule.Server.class).logout();
+    }
+
+
+    /**
+     * Grant developer role. Requires admin privilege.
+     * @param xapi XAPI
+     */
+    private void initPrivileges(XAPI xapi) {
+        logger.info("Init privileges...");
+        loginAsAdmin(xapi);
+        UserModule userModule = UserModule.getInstance();
+        XObjectID myId = userModule.getMe(xapi).ID;
+        userModule.grantDeveloperRole(xapi, myId);
+        logout(xapi);
+    }
+
+
+    /**
+     * Seed OSN with a bunch of users. Requires admin privilege.
      * @param xapi XAPI
      */
     private void seedUsers(XAPI xapi) {
+        loginAsAdmin(xapi);
         UserModule userModule = UserModule.getInstance();
         final int numUsers = userConf.getNumberOfUsers();
 
@@ -80,7 +137,40 @@ public class SeedEngine {
         logger.info("Adding user profile pics...");
         for (XUserInfo user : seededUsers) {
             userModule.createProfilePic(xapi, user.ID);
-            sleep(100);
+        }
+        sleep(2000);
+        logout(xapi);
+    }
+
+
+    /**
+     * Create contacts between users.
+     * Should be invoked only after users have been seeded.
+     * @param xapi XAPI
+     */
+    private void seedContacts(XAPI xapi) {
+        // First login as admin to get all users.
+        loginAsAdmin(xapi);
+        UserModule userModule = UserModule.getInstance();
+        ContactModule contactModule = ContactModule.getInstance();
+
+        final int numUsers = userConf.getNumberOfUsers();
+        List<XUserInfo> seededUsers = userModule.getAllTestUsers(xapi, numUsers);
+        logout(xapi);
+
+        // Next, login as user1 to add contacts.
+        if (seededUsers.size() > 0) {
+            loginAsUser(xapi, seededUsers.get(0));
+
+            // Add contacts.
+            logger.info("Adding contacts to " + seededUsers.get(0).DisplayName + "...");
+            for (XUserInfo user : seededUsers) {
+                if (user.ID != seededUsers.get(0).ID) {
+                    contactModule.createContact(xapi, user.ID);
+                }
+            }
+            sleep(2000);
+            logout(xapi);
         }
     }
 
@@ -91,6 +181,7 @@ public class SeedEngine {
      * @param xapi XAPI
      */
     private void seedCollections(XAPI xapi) {
+        loginAsAdmin(xapi);
         UserModule userModule = UserModule.getInstance();
         ConversationModule convModule = ConversationModule.getInstance();
         TrackableModule trackModule = TrackableModule.getInstance();
@@ -160,6 +251,8 @@ public class SeedEngine {
             }
             convModule.addMembers(xapi, collId, userIdList);
         }
+
+        logout(xapi);
     }
 
 
