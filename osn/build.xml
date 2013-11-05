@@ -86,9 +86,22 @@
                 <include name="**/*.class"/>
             </fileset>
             <fileset dir="${path.to.resources}">
-                <include name="**/*"/>
+                <exclude name="**/seed_properties.xml"/>
             </fileset>
+            <manifest>
+                <attribute name="Main-Class" value="org.adinfinitum.osn.seed.OSNSeederMain"/>
+                <attribute name="Implementation-Vendor" value="Ad.Infinitum"/>
+                <attribute name="Implementation-Title" value="OSN Seeded and Tester"/>
+                <attribute name="Implementation-Version" value="0.1"/>
+            </manifest>
+            <zipgroupfileset dir="${path.to.lib}/utils" includes="*.jar"/>
+            <zipgroupfileset dir="${path.to.lib}/waggle-sdk" includes="*.jar"/>
         </jar>
+        <copy todir="${path.to.deploy}">
+            <fileset dir="${path.to.resources}">
+                <include name="**/seed_properties.xml"/>
+            </fileset>
+        </copy>
     </target>
 
 

@@ -129,8 +129,15 @@ public class SeedEngine {
         final int numUsers = userConf.getNumberOfUsers();
 
         // Create a set of test users.
-        logger.info("Creating " + numUsers + " test users...");
-        userModule.createTestUsers(xapi, numUsers);
+        final int chunkSize = 50;
+        for (int i=0 ; i < numUsers ; i++) {
+            if (i % chunkSize == 0) {
+                logger.info("Creating users " + (i+1) + " to " + (i+chunkSize) + "...");
+                userModule.createTestUsers(xapi, i+1, chunkSize);
+                sleep(1000);
+            }
+        }
+
         List<XUserInfo> seededUsers = userModule.getAllTestUsers(xapi, numUsers);
 
         // Create user profile pics.

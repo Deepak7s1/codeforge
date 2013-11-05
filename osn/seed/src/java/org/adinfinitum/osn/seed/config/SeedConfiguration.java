@@ -41,6 +41,40 @@ public class SeedConfiguration {
      * Constructor.
      */
     private SeedConfiguration() {
+    }
+
+    /**
+     * Sets the seed configuration by using the XML input stream given.
+     */
+    public void setConfig(InputStream is) {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(is));
+            config.load(reader);
+            parseConfiguration();
+
+        }
+        catch (ConfigurationException ce) {
+            logger.log(Level.SEVERE, "Configuration exception in seed_properties.xml", ce);
+            System.exit(1);
+        }
+        catch (Exception e) {
+            logger.log(Level.SEVERE, "Unable to read seed_properties.xml", e);
+            System.exit(1);
+        }
+        finally {
+            try {
+                if (reader != null) reader.close();
+            } catch (Exception e) {
+                // do nothing.
+            }
+        }
+    }
+
+    /**
+     * Sets the seed configuration by looking for seed_properties.xml in its classloader path.
+     */
+    public void setConfig() {
         BufferedReader reader = null;
         try {
             InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("seed_properties.xml");

@@ -64,10 +64,11 @@ public class UserModule {
     /**
      * Create a bunch of test users 'user1' ... 'userN' with 'waggle' for password.
      * @param xapi XAPI
+     * @param initial the initial index
      * @param numUsers number of users to create
      */
-    public void createTestUsers(XAPI xapi, int numUsers) {
-        xapi.call(XUserModule.Server.class).createTestUsers("user", 1, numUsers);
+    public void createTestUsers(XAPI xapi, int initial, int numUsers) {
+        xapi.call(XUserModule.Server.class).createTestUsers("user", initial, numUsers);
     }
 
 
