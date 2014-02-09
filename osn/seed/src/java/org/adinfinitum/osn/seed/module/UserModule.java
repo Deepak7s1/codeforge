@@ -73,6 +73,17 @@ public class UserModule {
 
 
     /**
+     * Create a bunch of outside users 'ouser1' ... 'ouserN' with 'waggle' for password.
+     * @param xapi XAPI
+     * @param initial the initial index
+     * @param numUsers number of outside users to create
+     */
+    public void createOutsideUsers(XAPI xapi, int initial, int numUsers) {
+        xapi.call(XUserModule.Server.class).createOutsiderUsers("ouser", initial, numUsers);
+    }
+
+
+    /**
      * Get the list of XUserInfo pertaining to the test users.
      * @param xapi XAPI
      * @param numUsers number of test users

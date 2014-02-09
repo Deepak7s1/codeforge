@@ -127,17 +127,30 @@ public class SeedEngine {
         loginAsAdmin(xapi);
         UserModule userModule = UserModule.getInstance();
         final int numUsers = userConf.getNumberOfUsers();
+        final int numOutsiders = userConf.getNumberOfOutsiders();
 
         // Create a set of test users.
         final int chunkSize = 50;
         for (int i=0 ; i < numUsers ; i++) {
             if (i % chunkSize == 0) {
-                logger.info("Creating users " + (i+1) + " to " + (i+chunkSize) + "...");
+                int upperLimit = Math.min(numUsers, i+chunkSize);
+                logger.info("Creating users " + (i+1) + " to " + upperLimit + "...");
                 userModule.createTestUsers(xapi, i+1, chunkSize);
                 sleep(1000);
             }
         }
 
+        // Create a set of outside users.
+        for (int i=0 ; i < numOutsiders ; i++) {
+            if (i % chunkSize == 0) {
+                int upperLimit = Math.min(numOutsiders, i+chunkSize);
+                logger.info("Creating outsider users " + (i+1) + " to " + upperLimit + "...");
+                userModule.createOutsideUsers(xapi, i+1, chunkSize);
+                sleep(1000);
+            }
+        }
+
+        // Get only test users, not outside users.
         List<XUserInfo> seededUsers = userModule.getAllTestUsers(xapi, numUsers);
 
         // Create user profile pics.
