@@ -107,8 +107,8 @@
 
     <macrodef name="seed.runner">
         <sequential>
-            <java classname="org.adinfinitum.osn.seed.OSNSeederMain" fork="true" failonerror="true" maxmemory="128m">
-                <classpath refid="runtime.classpath"/>
+            <java jar="${path.to.deploy}/osn-test.jar" fork="true" failonerror="true" maxmemory="256m">
+                <arg value="${path.to.deploy}/seed_properties.xml"/>
             </java>
         </sequential>
     </macrodef>
