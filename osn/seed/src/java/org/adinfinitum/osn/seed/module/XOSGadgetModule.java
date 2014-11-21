@@ -31,12 +31,9 @@ public class XOSGadgetModule {
      * @return the GadgetID of the OSN Collection Gadget
      */
     public XObjectID getCollectionGadgetId(XAPI xapi) {
-        List<XOSGadgetInfo> gadgetInfos = xapi.call(XOSModule.Server.class).getAllAvailableGadgets();
-        for (XOSGadgetInfo gadgetInfo : gadgetInfos) {
-            String externalID = gadgetInfo.GadgetExternalID;
-            if (externalID != null && externalID.equals(WAGGLE_COLLECTION_EXTERNALID)) {
-                return gadgetInfo.ID;
-            }
+        XOSGadgetInfo gadgetInfo = xapi.call(XOSModule.Server.class).getGadgetByExternalID(WAGGLE_COLLECTION_EXTERNALID);
+        if (gadgetInfo != null) {
+            return gadgetInfo.ID;
         }
         return null;
     }

@@ -139,7 +139,7 @@ public class ConversationModule {
 
 
     /**
-     * Add user members to a Conversation, if they have < userIdList.size() members.
+     * Add user members to a Conversation, if they have &lt; userIdList.size() members.
      * @param xapi XAPI
      * @param conversationId the ConversationID
      * @param userIdList the list of user IDs
@@ -149,7 +149,7 @@ public class ConversationModule {
                            List<XObjectID> userIdList) {
         if (userIdList != null && !userIdList.isEmpty()) {
             List<XConversationMemberInfo> currentMembers =
-                    xapi.call(XConversationModule.Server.class).getConversationDirectMembers(conversationId);
+                    xapi.call(XConversationModule.Server.class).getConversationDirectMembersPagedEx(conversationId, 0, userIdList.size());
 
             if (currentMembers != null && currentMembers.size() < userIdList.size()) {
                 boolean errorIfRemovingSelf = false;
