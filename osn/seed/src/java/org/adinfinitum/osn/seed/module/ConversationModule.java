@@ -14,6 +14,10 @@ import waggle.common.modules.conversation.infos.XConversationDetailInfo;
 import waggle.common.modules.conversation.infos.XConversationInfo;
 import waggle.common.modules.conversation.infos.XConversationMemberChangeInfo;
 import waggle.common.modules.conversation.infos.XConversationMemberInfo;
+import waggle.common.modules.conversation.infos.XConversationMembersFilterInfo;
+import waggle.common.modules.conversation.enums.XConversationMemberType;
+import waggle.common.modules.conversation.enums.XConversationMemberSortField;
+
 import waggle.core.api.XAPI;
 import waggle.core.id.XObjectID;
 
@@ -147,9 +151,17 @@ public class ConversationModule {
     public void addMembers(XAPI xapi,
                            XObjectID conversationId,
                            List<XObjectID> userIdList) {
+        // Create filter.
+        XConversationMembersFilterInfo filter = new XConversationMembersFilterInfo();
+        filter.FirstResult = 0;
+        filter.NumResults = userIdList.size();
+        filter.ConversationID = conversationId;
+        filter.MemberType = XConversationMemberType.ALL_USER_MEMBERS;
+        filter.SortField = XConversationMemberSortField.CONVERSATION_MEMBER_DISPLAY_NAME;
+
         if (userIdList != null && !userIdList.isEmpty()) {
             List<XConversationMemberInfo> currentMembers =
-                    xapi.call(XConversationModule.Server.class).getConversationDirectMembersPagedEx(conversationId, 0, userIdList.size());
+                    xapi.call(XConversationModule.Server.class).getConversationMembers(filter);
 
             if (currentMembers != null && currentMembers.size() < userIdList.size()) {
                 boolean errorIfRemovingSelf = false;
