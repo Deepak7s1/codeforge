@@ -1,5 +1,6 @@
-const http = require('http');
+"use strict";
 
+const http = require('http');
 const serverPort = 8124;
 const serverHostname = "127.0.0.1";
 
